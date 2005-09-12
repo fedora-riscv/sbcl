@@ -1,11 +1,11 @@
-# $Id: sbcl.spec,v 1.2 2005/09/12 17:54:36 rdieter Exp $
+# $Id: sbcl.spec,v 1.3 2005/09/12 18:11:40 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
 ## (non sbcl bootstraps untested)
-#define bootstrap sbcl
-#define bootstrap cmucl
-#define bootstrap clisp
+#define sbcl_bootstrap sbcl
+#define sbcl_bootstrap cmucl
+#define sbcl_bootstrap clisp
 
 %if "%{?fedora}" >= "3"
 BuildRequires:setarch
@@ -21,7 +21,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 5%{?dist}
+Release: 6%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -32,20 +32,20 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 Source1: sbcl.sh
 
-%if "%{?bootstrap}" == "%{nil}"
+%if "%{?sbcl_bootstrap}" == "%{nil}"
 # local Bootstrap binaries
 Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
-%define bootstrap_src -a 10 
+%define sbcl_bootstrap_src -a 10 
 %endif
 Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-64-linux-binary.tar.bz2
 %ifarch %{x86_64}
-%define bootstrap_src -a 11 
+%define sbcl_bootstrap_src -a 11 
 %endif
 # Latest powerpc-linux bootstrap (untested)
 Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
-%define bootstrap_src -a 12
+%define sbcl_bootstrap_src -a 12
 %endif
 %endif
 
@@ -54,7 +54,7 @@ Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.4-ADDR_NO_RANDOMIZE.patch
 Patch3: sbcl-0.9.4-optflags.patch
 
-%{?bootstrap:BuildRequires: %{?bootstrap}}
+%{?sbcl_bootstrap:BuildRequires: %{?sbcl_bootstrap}}
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -69,7 +69,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup %{?bootstrap_src} 
+%setup %{?sbcl_bootstrap_src} 
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
@@ -88,7 +88,7 @@ sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 %endif
 #endif
 
-%if "%{?bootstrap}" == "%{nil}"
+%if "%{?sbcl_bootstrap}" == "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
 chmod +x install.sh
@@ -104,7 +104,7 @@ find . -name '.cvsignore' | xargs rm -f
 %build
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 
-%if "%{?bootstrap}" == "%{nil}"
+%if "%{?sbcl_bootstrap}" == "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
@@ -181,7 +181,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-5
+* Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-6
 - diagnose bootstrap snafu on buildsystem 
 
 * Tue Aug 30 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-4
