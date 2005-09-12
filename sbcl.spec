@@ -21,7 +21,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -53,6 +53,7 @@ Patch1: sbcl-0.8.18-default-sbcl-home.patch
 # See http://sourceforge.net/mailarchive/message.php?msg_id=12787069
 Patch2: sbcl-0.9.4-ADDR_NO_RANDOMIZE.patch
 Patch3: sbcl-0.9.4-optflags.patch
+Patch4: sbcl-0.9.4-LIB_DIR.patch
 
 %{?sbcl_bootstrap:BuildRequires: %{?sbcl_bootstrap}}
 
@@ -76,6 +77,7 @@ interpreter, and debugger.
 %patch1 -p0 -b .default-sbcl-home
 %patch2 -p1 -b .ADDR_NO_RANDOMIZE
 %patch3 -p1 -b .optflags
+%patch4 -p1 -b .LIB_DIR
 
 # http://article.gmane.org/gmane.lisp.steel-bank.general/340
 # enable threads (was only for >= 2.6, but code has checks to disable for <= 2.4)
@@ -99,6 +101,8 @@ popd
 # CVS crud 
 find . -name CVS -type d | xargs rm -rf
 find . -name '.cvsignore' | xargs rm -f
+# fix permissions (some have eXecute bit set)
+find . -name '*.c' | xargs chmod 644
 
 
 %build
@@ -116,19 +120,20 @@ make -C doc/manual html info
 
 
 %check || :
-%if "%{?_with_check:1}" == "1"
+#if "%{?_with_check:1}" == "1"
 pushd tests 
 %{?setarch} sh ./run-tests.sh 
 popd
-%endif
+#endif
 
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
-export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix}
 unset SBCL_HOME ||:
+export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix}
+export LIB_DIR=$RPM_BUILD_ROOT%{_libdir}
 %{?setarch} sh ./install.sh
 
 # app-wrapper for using setarch
@@ -143,13 +148,8 @@ sed -i -e "s|^SBCL_SETARCH=.*|SBCL_SETARCH=\"%{setarch}\"|" $RPM_BUILD_ROOT%{_bi
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
 rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
-# CVS crud 
-#find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
-#find $RPM_BUILD_ROOT -name '.cvsignore' | xargs rm -f
 # from make check
 find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
-# 
-find $RPM_BUILD_ROOT -name '*.c' | xargs chmod 644 
 
 
 %post
@@ -181,6 +181,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-8
+- use/define LIB_DIR instead of hard-coded INSTALL_ROOT/lib
+
 * Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-7
 - %{x86_64} -> x86_64
 
