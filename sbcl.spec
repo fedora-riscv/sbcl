@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.6 2005/09/12 19:18:18 rdieter Exp $
+# $Id: sbcl.spec,v 1.7 2005/09/12 20:36:18 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -21,14 +21,14 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 9%{?dist}
+Release: 10%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0:  http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#ExclusiveArch: %{ix86} x86_64
+ExclusiveArch: %{ix86}
 
 Source1: sbcl.sh
 
@@ -181,8 +181,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-9
+* Mon Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-10
 - use/define LIB_DIR instead of hard-coded INSTALL_ROOT/lib
+- ExclusiveArch: %{ix86} (for now)
 
 * Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-7
 - %{x86_64} -> x86_64
