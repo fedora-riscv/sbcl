@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.1 2005/09/12 12:36:44 rdieter Exp $
+# $Id: sbcl.spec,v 1.2 2005/09/12 17:54:36 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -21,7 +21,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -47,7 +47,6 @@ Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-b
 %ifarch ppc 
 %define bootstrap_src -a 12
 %endif
-
 %endif
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
@@ -70,7 +69,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?bootstrap_src} 
+%setup %{?bootstrap_src} 
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
@@ -91,11 +90,15 @@ sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 
 %if "%{?bootstrap}" == "%{nil}"
 mkdir sbcl-bootstrap
-pushd sbcl-%{version}-*-linux
+pushd sbcl-*-linux
 chmod +x install.sh
 INSTALL_ROOT=`pwd`/../sbcl-bootstrap ./install.sh
 popd
 %endif
+
+# CVS crud 
+find . -name CVS -type d | xargs rm -rf
+find . -name '.cvsignore' | xargs rm -f
 
 
 %build
@@ -140,10 +143,9 @@ sed -i -e "s|^SBCL_SETARCH=.*|SBCL_SETARCH=\"%{setarch}\"|" $RPM_BUILD_ROOT%{_bi
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
 rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
-
-# CVS crud
-find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
-find $RPM_BUILD_ROOT -name '.cvsignore' | xargs rm -f
+# CVS crud 
+#find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
+#find $RPM_BUILD_ROOT -name '.cvsignore' | xargs rm -f
 # from make check
 find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
 # 
@@ -179,6 +181,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-5
+- diagnose bootstrap snafu on buildsystem 
+
 * Tue Aug 30 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-4
 - safer NO_ADDR_RANDOMIZE patch
 - use %%{?setarch} in %%check too
