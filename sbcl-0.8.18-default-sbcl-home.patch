@@ -1,0 +1,55 @@
+Index: make-target-1.sh
+===================================================================
+RCS file: /cvsroot/sbcl/sbcl/make-target-1.sh,v
+retrieving revision 1.12
+diff -u -r1.12 make-target-1.sh
+--- make-target-1.sh	10 Sep 2004 15:36:17 -0000	1.12
++++ make-target-1.sh	3 Jan 2005 06:44:55 -0000
+@@ -15,6 +15,29 @@
+ 
+ echo //entering make-target-1.sh
+ 
++# Allow the definition of INSTALL_ROOT and/or SBCL_HOME to correctly
++# set the hard-coded SBCL_HOME macro in src/runtime/runtime.c
++
++DEFAULT_SBCL_HOME=${DEFAULT_SBCL_HOME:-/usr/local/lib/sbcl/}
++
++# Strip off any trailing / on the name; we'll add this later but don't
++# need two
++DEFAULT_SBCL_HOME=${DEFAULT_SBCL_HOME%/}
++
++export DEFAULT_SBCL_HOME
++
++file=src/runtime/sbcl-home.h
++echo "/* This is a machine-generated file.            */" > $file
++echo "/* Please do not edit it by hand.               */" >> $file
++echo "/* Change the default SBCL_HOME by setting the  */" >> $file
++echo "/* DEFAULT_SBCL_HOME environment variable prior */" >> $file
++echo "/* to building. See make-target-1.sh for more   */" >> $file
++echo "/* information.                                 */" >> $file
++echo "#ifndef SBCL_HOME" >> $file
++echo "#define SBCL_HOME \"$DEFAULT_SBCL_HOME/\"" >> $file
++echo "#endif" >> $file
++
++
+ # Build the runtime system and symbol table (.nm) file.
+ #
+ # (This C build has to come after the first genesis in order to get
+Index: src/runtime/runtime.c
+===================================================================
+RCS file: /cvsroot/sbcl/sbcl/src/runtime/runtime.c,v
+retrieving revision 1.43
+diff -u -r1.43 runtime.c
+--- src/runtime/runtime.c	29 Oct 2004 09:00:39 -0000	1.43
++++ src/runtime/runtime.c	3 Jan 2005 06:47:51 -0000
+@@ -61,9 +61,7 @@
+ #include "interr.h"
+ #endif
+ 
+-#ifndef SBCL_HOME
+-#define SBCL_HOME "/usr/local/lib/sbcl/"
+-#endif
++#include "sbcl-home.h"
+ 
+ 
+ /* SIGINT handler that invokes the monitor (for when Lisp isn't up to it) */

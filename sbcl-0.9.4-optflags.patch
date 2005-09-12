@@ -1,0 +1,12 @@
+--- sbcl-0.9.4/src/runtime/GNUmakefile.optflags	2005-08-19 07:15:15.000000000 -0500
++++ sbcl-0.9.4/src/runtime/GNUmakefile	2005-08-30 10:24:17.010651427 -0500
+@@ -22,7 +22,8 @@
+ DEPEND_FLAGS = -MM
+ GREP = grep
+ 
+-CFLAGS = -g -Wall -O3
++#CFLAGS = -g -Wall -O3
++CFLAGS = $(RPM_OPT_FLAGS)
+ ASFLAGS = $(CFLAGS)
+ CPPFLAGS = -I.
+ 
