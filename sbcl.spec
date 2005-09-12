@@ -21,7 +21,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -39,7 +39,7 @@ Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-linux-b
 %define sbcl_bootstrap_src -a 10 
 %endif
 Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-64-linux-binary.tar.bz2
-%ifarch %{x86_64}
+%ifarch x86_64
 %define sbcl_bootstrap_src -a 11 
 %endif
 # Latest powerpc-linux bootstrap (untested)
@@ -83,7 +83,7 @@ interpreter, and debugger.
 ## to customize features -- Rex
 #define kernel_ver %(uname -r | cut -d- -f1 | cut -d. -f-2 )
 #if "%{?kernel_ver}" >= "2.6"
-%ifarch %{ix86} %{x86_64}
+%ifarch %{ix86} x86_64
 sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 %endif
 #endif
@@ -181,8 +181,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-6
-- diagnose bootstrap snafu on buildsystem 
+* Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-7
+- %{x86_64} -> x86_64
 
 * Tue Aug 30 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-4
 - safer NO_ADDR_RANDOMIZE patch
