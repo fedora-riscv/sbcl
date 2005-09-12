@@ -21,7 +21,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 8%{?dist}
+Release: 9%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -181,7 +181,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-8
+* Mon Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-9
 - use/define LIB_DIR instead of hard-coded INSTALL_ROOT/lib
 
 * Mon Sep 12 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-7
