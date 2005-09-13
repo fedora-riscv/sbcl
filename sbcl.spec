@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.9 2005/09/13 17:04:26 rdieter Exp $
+# $Id: sbcl.spec,v 1.10 2005/09/13 19:03:04 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -26,7 +26,7 @@ Requires:setarch
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 12%{?dist}
+Release: 13%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -97,7 +97,7 @@ interpreter, and debugger.
 #define kernel_ver %(uname -r | cut -d- -f1 | cut -d. -f-2 )
 #if "%{?kernel_ver}" >= "2.6"
 %ifarch %{ix86} x86_64
-sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
+#sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 %endif
 #endif
 
@@ -192,6 +192,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-13
+- don't enable sb-thread
+
 * Tue Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-12
 - omit ppc (for now, broken buildsystem)
 
