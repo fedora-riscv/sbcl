@@ -1,0 +1,123 @@
+--- sbcl-0.9.4/src/runtime/os.h.ADDR_NO_RANDOMIZE	2005-07-14 10:41:20.000000000 -0500
++++ sbcl-0.9.4/src/runtime/os.h	2005-08-30 12:16:42.781282788 -0500
+@@ -50,7 +50,7 @@
+ 
+ /* Do anything we need to do when starting up the runtime environment
+  * in this OS. */
+-extern void os_init(void);
++extern void os_init(char *argv[], char *envp[]);
+ 
+ /* Install any OS-dependent low-level signal handlers which are needed
+  * by the runtime environment. E.g. the signals raised by a violation
+--- sbcl-0.9.4/src/runtime/linux-os.c.ADDR_NO_RANDOMIZE	2005-08-12 14:08:19.000000000 -0500
++++ sbcl-0.9.4/src/runtime/linux-os.c	2005-08-30 12:17:31.208291595 -0500
+@@ -44,6 +44,7 @@
+ #include <sys/stat.h>
+ #include <unistd.h>
+ #include <linux/version.h>
++#include <sys/personality.h>
+ 
+ #include "validate.h"
+ #include "thread.h"
+@@ -92,7 +93,7 @@
+ int linux_no_threads_p = 0;
+ 
+ void
+-os_init(void)
++os_init(char *argv[], char *envp[])
+ {
+     /* Conduct various version checks: do we have enough mmap(), is
+      * this a sparc running 2.2, can we do threads? */
+@@ -117,7 +118,7 @@
+         FSHOW((stderr,"linux kernel %d.%d predates 2.4;\n enabling workarounds for SPARC kernel bugs in signal handling.\n", major_version,minor_version));
+         linux_sparc_siginfo_bug = 1;
+ #endif
+-    }
++    }   
+ #ifdef LISP_FEATURE_SB_THREAD
+     futex_wait(futex,-1);
+     if(errno==ENOSYS)  linux_no_threads_p = 1;
+@@ -125,6 +126,36 @@
+         fprintf(stderr,"Linux with NPTL support (e.g. kernel 2.6 or newer) required for \nthread-enabled SBCL.  Disabling thread support.\n\n");
+ #endif
+     os_vm_page_size = getpagesize();
++   
++    /* KLUDGE: Disable memory randomization on new Linux kernels
++     * by setting a personality flag and re-executing. (We need
++     * to re-execute, since the memory maps that can conflict with
++     * the SBCL spaces have already been done at this point).
++     */
++#if defined(LISP_FEATURE_X86)
++    if ((major_version == 2) && (minor_version >= 6) || (major_version >= 3)) {
++       long pers = personality(-1);
++       /* 0x40000 aka. ADDR_NO_RANDOMIZE */
++       if (!(pers & 0x40000)) {
++	 if (personality(pers | 0x40000) != -1) {
++	     /* Use /proc/self/exe instead of trying to figure out the
++	      * executable path from PATH and argv[0], since that's reliable.
++	      */
++	     char buf[PATH_MAX+1];
++	     int rc = readlink("/proc/self/exe", buf, PATH_MAX);
++             if ( rc > 0 ) {
++	       buf[rc]=0;
++	       execve(buf, argv, envp);
++	     }
++	  }
++	  /* Either changing the personality or execve() failed. Either
++	   * way we might as well continue, and hope that the random
++	   * memory maps are ok this time around.
++	   */
++	  fprintf(stderr, "WARNING: Couldn't re-execute SBCL with the proper personality flags (maybe /proc isn't mounted?). Trying to continue anyway.\n");
++       }
++    }     
++#endif   
+ }
+ 
+ 
+--- sbcl-0.9.4/src/runtime/osf1-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:20.000000000 -0500
++++ sbcl-0.9.4/src/runtime/osf1-os.c	2005-08-30 12:16:42.783282706 -0500
+@@ -51,7 +51,8 @@
+ 
+ 
+ 
+-void os_init(void)
++void
++os_init(char *argv[], char *envp[])
+ {
+     os_vm_page_size = getpagesize();
+ }
+--- sbcl-0.9.4/src/runtime/bsd-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:11.000000000 -0500
++++ sbcl-0.9.4/src/runtime/bsd-os.c	2005-08-30 12:16:42.784282665 -0500
+@@ -51,7 +51,8 @@
+ static void netbsd_init();
+ #endif /* __NetBSD__ */
+ 
+-void os_init(void)
++void
++os_init(char *argv[], char *envp[])
+ {
+     os_vm_page_size = getpagesize();
+ 
+--- sbcl-0.9.4/src/runtime/runtime.c.ADDR_NO_RANDOMIZE	2005-08-30 12:16:42.778282911 -0500
++++ sbcl-0.9.4/src/runtime/runtime.c	2005-08-30 12:16:42.785282623 -0500
+@@ -194,7 +194,7 @@
+     /* KLUDGE: os_vm_page_size is set by os_init(), and on some
+      * systems (e.g. Alpha) arch_init() needs need os_vm_page_size, so
+      * it must follow os_init(). -- WHN 2000-01-26 */
+-    os_init();
++    os_init(argv, envp);
+     arch_init();
+     gc_init();
+     validate();
+--- sbcl-0.9.4/src/runtime/sunos-os.c.ADDR_NO_RANDOMIZE	2005-08-19 07:15:16.000000000 -0500
++++ sbcl-0.9.4/src/runtime/sunos-os.c	2005-08-30 12:16:42.786282582 -0500
+@@ -53,7 +53,8 @@
+ int KLUDGE_MAYBE_MAP_ANON = 0x0;
+ int kludge_mmap_fd = -1; /* default for MAP_ANON */
+ 
+-void os_init(void)
++void
++os_init(char *argv[], char *envp[])
+ {
+     struct utsname name;
+     int major_version;

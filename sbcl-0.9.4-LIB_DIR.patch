@@ -4,7 +4,7 @@
  MAN_DIR=${MAN_DIR-$INSTALL_ROOT/share/man}
  INFO_DIR=${INFO_DIR-$INSTALL_ROOT/share/info}
  DOC_DIR=${DOC_DIR-$INSTALL_ROOT/share/doc/sbcl}
-+LIB_DIR=${LIB_DIR-$INSTALL_ROOT/lib}}
++LIB_DIR=${LIB_DIR-$INSTALL_ROOT/lib}
  
  # Does the environment look sane?
  SBCL_SOURCE=`pwd`

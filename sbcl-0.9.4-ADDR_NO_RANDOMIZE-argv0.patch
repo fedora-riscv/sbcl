@@ -1,5 +1,5 @@
 --- sbcl-0.9.4/src/runtime/os.h.ADDR_NO_RANDOMIZE	2005-07-14 10:41:20.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/os.h	2005-08-30 12:16:42.781282788 -0500
++++ sbcl-0.9.4/src/runtime/os.h	2005-09-13 11:23:31.319884384 -0500
 @@ -50,7 +50,7 @@
  
  /* Do anything we need to do when starting up the runtime environment
@@ -10,12 +10,12 @@
  /* Install any OS-dependent low-level signal handlers which are needed
   * by the runtime environment. E.g. the signals raised by a violation
 --- sbcl-0.9.4/src/runtime/linux-os.c.ADDR_NO_RANDOMIZE	2005-08-12 14:08:19.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/linux-os.c	2005-08-30 12:17:31.208291595 -0500
++++ sbcl-0.9.4/src/runtime/linux-os.c	2005-09-13 11:26:47.110833967 -0500
 @@ -44,6 +44,7 @@
  #include <sys/stat.h>
  #include <unistd.h>
  #include <linux/version.h>
-+#include <linux/personality.h>
++#include <sys/personality.h>
  
  #include "validate.h"
  #include "thread.h"
@@ -37,7 +37,7 @@
  #ifdef LISP_FEATURE_SB_THREAD
      futex_wait(futex,-1);
      if(errno==ENOSYS)  linux_no_threads_p = 1;
-@@ -125,6 +126,36 @@
+@@ -125,6 +126,28 @@
          fprintf(stderr,"Linux with NPTL support (e.g. kernel 2.6 or newer) required for \nthread-enabled SBCL.  Disabling thread support.\n\n");
  #endif
      os_vm_page_size = getpagesize();
@@ -53,21 +53,13 @@
 +       /* 0x40000 aka. ADDR_NO_RANDOMIZE */
 +       if (!(pers & 0x40000)) {
 +	 if (personality(pers | 0x40000) != -1) {
-+	     /* Use /proc/self/exe instead of trying to figure out the
-+	      * executable path from PATH and argv[0], since that's reliable.
-+	      */
-+	     char buf[PATH_MAX+1];
-+	     int rc = readlink("/proc/self/exe", buf, PATH_MAX);
-+             if ( rc > 0 ) {
-+	       buf[rc]=0;
-+	       execve(buf, argv, envp);
-+	     }
-+	  }
-+	  /* Either changing the personality or execve() failed. Either
-+	   * way we might as well continue, and hope that the random
-+	   * memory maps are ok this time around.
-+	   */
-+	  fprintf(stderr, "WARNING: Couldn't re-execute SBCL with the proper personality flags (maybe /proc isn't mounted?). Trying to continue anyway.\n");
++	   execve(argv[0], argv, envp);
++	 }
++	 /* Either changing the personality or execve() failed. Either
++	  * way we might as well continue, and hope that the random
++	  * memory maps are ok this time around.
++	  */
++	 fprintf(stderr, "WARNING: Couldn't re-execute SBCL with the proper personality flags.  Trying to continue anyway.\n");
 +       }
 +    }     
 +#endif   
@@ -75,7 +67,7 @@
  
  
 --- sbcl-0.9.4/src/runtime/osf1-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:20.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/osf1-os.c	2005-08-30 12:16:42.783282706 -0500
++++ sbcl-0.9.4/src/runtime/osf1-os.c	2005-09-13 11:23:31.321884302 -0500
 @@ -51,7 +51,8 @@
  
  
@@ -87,7 +79,7 @@
      os_vm_page_size = getpagesize();
  }
 --- sbcl-0.9.4/src/runtime/bsd-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:11.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/bsd-os.c	2005-08-30 12:16:42.784282665 -0500
++++ sbcl-0.9.4/src/runtime/bsd-os.c	2005-09-13 11:23:31.322884261 -0500
 @@ -51,7 +51,8 @@
  static void netbsd_init();
  #endif /* __NetBSD__ */
@@ -98,8 +90,8 @@
  {
      os_vm_page_size = getpagesize();
  
---- sbcl-0.9.4/src/runtime/runtime.c.ADDR_NO_RANDOMIZE	2005-08-30 12:16:42.778282911 -0500
-+++ sbcl-0.9.4/src/runtime/runtime.c	2005-08-30 12:16:42.785282623 -0500
+--- sbcl-0.9.4/src/runtime/runtime.c.ADDR_NO_RANDOMIZE	2005-09-13 11:23:31.315884548 -0500
++++ sbcl-0.9.4/src/runtime/runtime.c	2005-09-13 11:23:31.323884220 -0500
 @@ -194,7 +194,7 @@
      /* KLUDGE: os_vm_page_size is set by os_init(), and on some
       * systems (e.g. Alpha) arch_init() needs need os_vm_page_size, so
@@ -110,7 +102,7 @@
      gc_init();
      validate();
 --- sbcl-0.9.4/src/runtime/sunos-os.c.ADDR_NO_RANDOMIZE	2005-08-19 07:15:16.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/sunos-os.c	2005-08-30 12:16:42.786282582 -0500
++++ sbcl-0.9.4/src/runtime/sunos-os.c	2005-09-13 11:23:31.324884178 -0500
 @@ -53,7 +53,8 @@
  int KLUDGE_MAYBE_MAP_ANON = 0x0;
  int kludge_mmap_fd = -1; /* default for MAP_ANON */
