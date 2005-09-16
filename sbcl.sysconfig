@@ -1,3 +1,0 @@
-# /etc/sysconfig/sbcl
-
-SBCL_HOME=/usr/lib/sbcl
