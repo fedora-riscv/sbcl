@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Source global config, if it exists
-if [ -f /etc/sysconfig/sbcl ]; then
-  source /etc/sysconfig/sbcl
+if [  -f /etc/sbcl.conf ]; then
+  source /etc/sbcl.conf
 fi
 
 exec ${SBCL_HOME}/sbcl ${1+"$@"}
