@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.10 2005/09/13 19:03:04 rdieter Exp $
+# $Id: sbcl.spec,v 1.11 2005/09/16 19:15:45 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -9,7 +9,6 @@
 
 %if "%{?fedora}" >= "3"
 BuildRequires:setarch
-Requires:setarch
 %define setarch setarch %{_target_cpu}
 %endif
 
@@ -17,28 +16,22 @@ Requires:setarch
 %define setarch setarch %{_target_cpu} -R
 %endif
 
-%if "%{?rhel}" >= "4"
+%if "%{?rhel}" >= "3"
 BuildRequires:setarch
-Requires:setarch
 %define setarch setarch %{_target_cpu}
 %endif
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 13%{?dist}
+Release: 14%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0:  http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64
-
-# App-wrapper
-Source1: sbcl.sh
-# /etc/sysconfig/sbcl
-Source2: sbcl.sysconfig
+ExclusiveArch: %{ix86} x86_64 ppc 
 
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 # local Bootstrap binaries
@@ -148,14 +141,6 @@ export LIB_DIR=$RPM_BUILD_ROOT%{_libdir}
 # (may) still need setarch if using ADDR_NO_RANDOMIZE-proc patch
 sh ./install.sh
 
-# app-wrapper 
-%if 0
-mv $RPM_BUILD_ROOT%{_bindir}/sbcl $RPM_BUILD_ROOT%{_libdir}/sbcl/sbcl
-install -p -m755 -D %{SOURCE1} $RPM_BUILD_ROOT%{_bindir}/sbcl
-install -p -m644 -D %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/sbcl
-#{?setarch:echo "SBCL_SETARCH=\"%{setarch}\"|" >> $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/sbcl 
-%endif
-
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
 rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
@@ -192,6 +177,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep 16 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-14
+- re-enable ppc
+- drop Req: setarch
+- drop extraneous app-wrapper bits
+
 * Tue Sep 13 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-13
 - don't enable sb-thread
 
