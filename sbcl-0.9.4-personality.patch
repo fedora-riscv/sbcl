@@ -5,7 +5,7 @@
  /* Do anything we need to do when starting up the runtime environment
   * in this OS. */
 -extern void os_init(void);
-+extern void os_init(char *argv[], char *envp[]);
++extern void os_init(char *argv[]);
  
  /* Install any OS-dependent low-level signal handlers which are needed
   * by the runtime environment. E.g. the signals raised by a violation
@@ -24,7 +24,7 @@
  
  void
 -os_init(void)
-+os_init(char *argv[], char *envp[])
++os_init(char *argv[])
  {
      /* Conduct various version checks: do we have enough mmap(), is
       * this a sparc running 2.2, can we do threads? */
@@ -53,9 +53,9 @@
 +       /* 0x40000 aka. ADDR_NO_RANDOMIZE */
 +       if (!(pers & 0x40000)) {
 +	 if (personality(pers | 0x40000) != -1) {
-+	   execve(argv[0], argv, envp);
++	   execvp(argv[0], argv);
 +	 }
-+	 /* Either changing the personality or execve() failed. Either
++	 /* Either changing the personality or (re)exec failed. Either
 +	  * way we might as well continue, and hope that the random
 +	  * memory maps are ok this time around.
 +	  */
@@ -66,30 +66,6 @@
  }
  
  
---- sbcl-0.9.4/src/runtime/osf1-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:20.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/osf1-os.c	2005-09-13 11:23:31.321884302 -0500
-@@ -51,7 +51,8 @@
- 
- 
- 
--void os_init(void)
-+void
-+os_init(char *argv[], char *envp[])
- {
-     os_vm_page_size = getpagesize();
- }
---- sbcl-0.9.4/src/runtime/bsd-os.c.ADDR_NO_RANDOMIZE	2005-07-14 10:41:11.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/bsd-os.c	2005-09-13 11:23:31.322884261 -0500
-@@ -51,7 +51,8 @@
- static void netbsd_init();
- #endif /* __NetBSD__ */
- 
--void os_init(void)
-+void
-+os_init(char *argv[], char *envp[])
- {
-     os_vm_page_size = getpagesize();
- 
 --- sbcl-0.9.4/src/runtime/runtime.c.ADDR_NO_RANDOMIZE	2005-09-13 11:23:31.315884548 -0500
 +++ sbcl-0.9.4/src/runtime/runtime.c	2005-09-13 11:23:31.323884220 -0500
 @@ -194,7 +194,7 @@
@@ -97,19 +73,7 @@
       * systems (e.g. Alpha) arch_init() needs need os_vm_page_size, so
       * it must follow os_init(). -- WHN 2000-01-26 */
 -    os_init();
-+    os_init(argv, envp);
++    os_init(argv);
      arch_init();
      gc_init();
      validate();
---- sbcl-0.9.4/src/runtime/sunos-os.c.ADDR_NO_RANDOMIZE	2005-08-19 07:15:16.000000000 -0500
-+++ sbcl-0.9.4/src/runtime/sunos-os.c	2005-09-13 11:23:31.324884178 -0500
-@@ -53,7 +53,8 @@
- int KLUDGE_MAYBE_MAP_ANON = 0x0;
- int kludge_mmap_fd = -1; /* default for MAP_ANON */
- 
--void os_init(void)
-+void
-+os_init(char *argv[], char *envp[])
- {
-     struct utsname name;
-     int major_version;
