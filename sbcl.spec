@@ -7,29 +7,15 @@
 #define sbcl_bootstrap cmucl
 #define sbcl_bootstrap clisp
 
-%if "%{?fedora}" >= "3"
-BuildRequires:setarch
-%define setarch setarch %{_target_cpu}
-%endif
-
-%if "%{?fedora}" >= "4"
-%define setarch setarch %{_target_cpu} -R
-%endif
-
-%if "%{?rhel}" >= "3"
-BuildRequires:setarch
-%define setarch setarch %{_target_cpu}
-%endif
-
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 15%{?dist}
+Release: 18%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
-Source0:  http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
+Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: %{ix86} x86_64
 
@@ -50,12 +36,10 @@ Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-b
 %endif
 %endif
 
+Source100: my_setarch.c
+
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
-# See http://sourceforge.net/mailarchive/message.php?msg_id=12787069
-# use /proc/self/exe
-#Patch2: sbcl-0.9.4-ADDR_NO_RANDOMIZE-proc.patch
-# use argv[0]
-Patch2: sbcl-0.9.4-ADDR_NO_RANDOMIZE-argv0.patch
+Patch2: sbcl-0.9.4-personality.patch
 Patch3: sbcl-0.9.4-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 
@@ -79,7 +63,7 @@ interpreter, and debugger.
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
 %patch1 -p0 -b .default-sbcl-home
-%{?setarch:%patch2 -p1 -b .ADDR_NO_RANDOMIZE}
+%patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
 
@@ -115,6 +99,9 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
+
+%{__cc} %{SOURCE100} -o my_setarch
+%define setarch ./my_setarch
 %endif
 
 %{?setarch} ./make.sh %{?bootstrap}
@@ -125,8 +112,6 @@ make -C doc/manual html info
 
 %check || :
 pushd tests 
-# still need setarch if using ADDR_NO_RANDOMIZE-proc patch, since /proc isn't available on buildsystem/mock.
-#{?setarch} sh ./run-tests.sh 
 sh ./run-tests.sh
 popd
 
@@ -138,7 +123,6 @@ mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
 unset SBCL_HOME ||:
 export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix}
 export LIB_DIR=$RPM_BUILD_ROOT%{_libdir}
-# (may) still need setarch if using ADDR_NO_RANDOMIZE-proc patch
 sh ./install.sh
 
 ## Unpackaged files
@@ -177,6 +161,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-18
+- drop use of setarch, use my_setarch.c
+
+* Mon Sep 19 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-17
+- rework personality/reexec patch (execve -> execvp)
+
 * Sat Sep 16 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-15
 - disable ppc (probably related to #166347)
 
