@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 18%{?dist}
+Release: 19%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -161,7 +161,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-18
+* Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-19
 - drop use of setarch, use my_setarch.c
 
 * Mon Sep 19 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-17
