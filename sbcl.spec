@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.13 2005/09/21 13:47:15 rdieter Exp $
+# $Id: sbcl.spec,v 1.14 2005/09/22 14:10:29 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -7,26 +7,10 @@
 #define sbcl_bootstrap cmucl
 #define sbcl_bootstrap clisp
 
-%if "%{?bootstrap}" == "%{nil}"
-%if "%{?fedora}" >= "3"
-BuildRequires:setarch
-%define setarch setarch %{_target_cpu}
-%endif
-
-%if "%{?fedora}" >= "4"
-%define setarch setarch %{_target_cpu} -R
-%endif
-
-%if "%{?rhel}" >= "3"
-BuildRequires:setarch
-%define setarch setarch %{_target_cpu}
-%endif
-%endif
-
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.4
-Release: 17%{?dist}
+Release: 19%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -51,6 +35,8 @@ Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-b
 %define sbcl_bootstrap_src -a 12
 %endif
 %endif
+
+Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.4-personality.patch
@@ -113,6 +99,9 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
+
+%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+%define setarch ./my_setarch
 %endif
 
 %{?setarch} ./make.sh %{?bootstrap}
@@ -172,6 +161,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-19
+- drop use of setarch, use my_setarch.c
+
 * Mon Sep 19 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-17
 - rework personality/reexec patch (execve -> execvp)
 
