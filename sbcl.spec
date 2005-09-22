@@ -100,7 +100,7 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
-%{__cc} %{SOURCE100} -o my_setarch
+%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
 %define setarch ./my_setarch
 %endif
 
