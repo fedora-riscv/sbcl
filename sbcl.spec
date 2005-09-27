@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.15 2005/09/27 16:52:30 rdieter Exp $
+# $Id: sbcl.spec,v 1.16 2005/09/27 18:04:55 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -21,12 +21,12 @@ ExclusiveArch: %{ix86} x86_64 ppc
 
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 # local Bootstrap binaries
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_bootstrap sbcl
 #define sbcl_bootstrap_src -a 10 
 %endif
-Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
+#Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_bootstrap sbcl
 #define sbcl_bootstrap_src -a 11 
@@ -165,7 +165,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-1
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-2
 - 0.9.5
 - use native sbcl bootstraps, when available (ie, %%{ix86},x86_64)
 - try ppc again
