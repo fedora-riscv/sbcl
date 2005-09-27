@@ -1,9 +1,9 @@
-# $Id: sbcl.spec,v 1.21 2005/09/27 20:07:27 rdieter Exp $
+# $Id: sbcl.spec,v 1.22 2005/09/27 20:10:04 rdieter Exp $
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 6%{?dist}
+Release: 7%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -31,7 +31,7 @@ BuildRequires: sbcl
 ## ppc section
 # Latest powerpc-linux bootstrap, busted:
 # buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 %ifarch ppc 
@@ -165,7 +165,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-6
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-7
 - drop ppc
 - cleaner optflags patch
 
