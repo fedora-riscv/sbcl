@@ -19,6 +19,8 @@ Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.b
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: %{ix86} x86_64 ppc
 
+%define sbcl_arch %{_target_cpu}
+
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 # local Bootstrap binaries
 #Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
@@ -28,6 +30,7 @@ ExclusiveArch: %{ix86} x86_64 ppc
 %endif
 #Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
+%define sbcl_arch x86-64
 %define sbcl_bootstrap sbcl
 #define sbcl_bootstrap_src -a 20 
 %endif
@@ -113,9 +116,7 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %define my_setarch ./my_setarch
 %endif
 
-%ifarch ppc
-export SBCL_ARCH=%{_target_cpu}
-%endif
+%{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} ./make.sh %{?bootstrap}
 
 # docs
