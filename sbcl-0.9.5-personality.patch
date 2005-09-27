@@ -1,0 +1,13 @@
+--- sbcl-0.9.5/src/runtime/linux-os.c.pers	2005-09-24 09:29:54.000000000 -0500
++++ sbcl-0.9.5/src/runtime/linux-os.c	2005-09-27 09:37:33.463478519 -0500
+@@ -177,6 +177,10 @@
+                 if (i != -1) {
+                     runtime[i] = '\0';
+                     execve(runtime, argv, envp);
++                } else {
++                    /* if /proc isn't available (like in chroot builds, like mock), 
++                     * try using execvp with argv[0] instead */
++                    execvp(argv[0], argv);
+                 }
+             }
+             /* Either changing the personality or execve() failed. Either

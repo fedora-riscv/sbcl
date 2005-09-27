@@ -1,0 +1,33 @@
+--- sbcl-0.9.5/src/runtime/Config.ppc-linux.optflags	2005-09-21 10:01:15.000000000 -0500
++++ sbcl-0.9.5/src/runtime/Config.ppc-linux	2005-09-27 15:03:06.295658344 -0500
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g
++CFLAGS += $(RPM_OPT_FLAGS)
+ LINKFLAGS += -v -rdynamic
+ NM = ./linux-nm
+ 
+--- sbcl-0.9.5/src/runtime/Config.x86_64-linux.optflags	2005-09-21 10:01:15.000000000 -0500
++++ sbcl-0.9.5/src/runtime/Config.x86_64-linux	2005-09-27 15:04:31.690676328 -0500
+@@ -34,7 +34,7 @@
+                       > /dev/null 2>&1; \
+                    then echo "-lpthread"; fi)
+ 
+-CFLAGS += -fno-omit-frame-pointer
++CFLAGS += -fno-omit-frame-pointer $(RPM_OPT_FLAGS)
+ 
+ GC_SRC = gencgc.c
+ 
+--- sbcl-0.9.5/src/runtime/Config.x86-linux.optflags	2005-09-21 10:01:15.000000000 -0500
++++ sbcl-0.9.5/src/runtime/Config.x86-linux	2005-09-27 15:05:03.562831024 -0500
+@@ -34,6 +34,8 @@
+                       > /dev/null 2>&1; \
+                    then echo "-lpthread"; fi)
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.

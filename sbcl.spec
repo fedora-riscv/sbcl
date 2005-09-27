@@ -1,16 +1,9 @@
 # $Id: sbcl.spec,v 1.8 2003/11/12 16:47:44 rexdieter Exp $
 
-## Default to using a local bootstrap, 
-## define one of the following to override 
-## (non sbcl bootstraps untested)
-#define sbcl_bootstrap sbcl
-#define sbcl_bootstrap cmucl
-#define sbcl_bootstrap clisp
-
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.4
-Release: 19%{?dist}
+Version: 0.9.5
+Release: 7%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -19,31 +12,41 @@ Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.b
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: %{ix86} x86_64
 
-%if "%{?sbcl_bootstrap}" == "%{nil}"
-# local Bootstrap binaries
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-linux-binary.tar.bz2
+## x86 section
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
-%define sbcl_bootstrap_src -a 10 
+%define sbcl_arch x86
+BuildRequires: sbcl
+#define sbcl_bootstrap_src -a 10 
 %endif
-Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-64-linux-binary.tar.bz2
+
+## x86_64 section
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
-%define sbcl_bootstrap_src -a 11 
+%define sbcl_arch x86-64
+BuildRequires: sbcl
+#define sbcl_bootstrap_src -a 20 
 %endif
-# Latest powerpc-linux bootstrap (untested)
-Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+
+## ppc section
+# Latest powerpc-linux bootstrap, busted:
+# buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+# another possible ppc bootstrap to try
+#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 %ifarch ppc 
-%define sbcl_bootstrap_src -a 12
-%endif
+%define sbcl_arch ppc
+%define sbcl_bootstrap_src -a 30
+BuildRequires: setarch
+%define setarch setarch %{_target_cpu}
 %endif
 
 Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
-Patch2: sbcl-0.9.4-personality.patch
-Patch3: sbcl-0.9.4-optflags.patch
+Patch2: sbcl-0.9.5-personality.patch
+Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
-
-%{?sbcl_bootstrap:BuildRequires: %{?sbcl_bootstrap}}
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -78,7 +81,7 @@ interpreter, and debugger.
 %endif
 #endif
 
-%if "%{?sbcl_bootstrap}" == "%{nil}"
+%if "%{?sbcl_bootstrap_src}" != "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
 chmod +x install.sh
@@ -96,15 +99,16 @@ find . -name '*.c' | xargs chmod 644
 %build
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 
-%if "%{?sbcl_bootstrap}" == "%{nil}"
+%if "%{?sbcl_bootstrap_src}" != "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
 %{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define setarch ./my_setarch
+%define my_setarch ./my_setarch
 %endif
 
-%{?setarch} ./make.sh %{?bootstrap}
+%{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
+%{?setarch} %{?my_setarch} ./make.sh %{?bootstrap}
 
 # docs
 make -C doc/manual html info
@@ -112,7 +116,7 @@ make -C doc/manual html info
 
 %check || :
 pushd tests 
-sh ./run-tests.sh
+%{?setarch} sh ./run-tests.sh
 popd
 
 
@@ -161,6 +165,19 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-7
+- drop ppc
+- cleaner optflags patch
+
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-5
+- set/use SBCL_ARCH/setarch (esp on ppc)
+- allow arch-specific build-options
+
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-2
+- 0.9.5
+- use native sbcl bootstraps, when available (ie, %%{ix86},x86_64)
+- try ppc again
+
 * Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-19
 - drop use of setarch, use my_setarch.c
 
