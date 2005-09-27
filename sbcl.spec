@@ -9,29 +9,33 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.4
-Release: 19%{?dist}
+Version: 0.9.5
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64
+ExclusiveArch: %{ix86} x86_64 ppc
 
 %if "%{?sbcl_bootstrap}" == "%{nil}"
 # local Bootstrap binaries
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-linux-binary.tar.bz2
+Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
-%define sbcl_bootstrap_src -a 10 
+%define sbcl_bootstrap sbcl
+#define sbcl_bootstrap_src -a 10 
 %endif
-Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-x86-64-linux-binary.tar.bz2
+Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
-%define sbcl_bootstrap_src -a 11 
+%define sbcl_bootstrap sbcl
+#define sbcl_bootstrap_src -a 11 
 %endif
-# Latest powerpc-linux bootstrap (untested)
+# Latest powerpc-linux bootstrap, busted:
+# buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
 Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
+%undefine sbcl_bootstrap
 %define sbcl_bootstrap_src -a 12
 %endif
 %endif
@@ -39,7 +43,7 @@ Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-b
 Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
-Patch2: sbcl-0.9.4-personality.patch
+Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.4-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 
@@ -161,6 +165,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-1
+- 0.9.5
+- use native sbcl bootstraps, when available (ie, %%{ix86},x86_64)
+- try ppc again
+
 * Thu Sep 22 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.4-19
 - drop use of setarch, use my_setarch.c
 
