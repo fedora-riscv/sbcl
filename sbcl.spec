@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -26,17 +26,21 @@ ExclusiveArch: %{ix86} x86_64 ppc
 %define sbcl_bootstrap sbcl
 #define sbcl_bootstrap_src -a 10 
 %endif
-#Source11: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_bootstrap sbcl
-#define sbcl_bootstrap_src -a 11 
+#define sbcl_bootstrap_src -a 20 
 %endif
 # Latest powerpc-linux bootstrap, busted:
 # buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
-Source12: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+# another possible ppc bootstrap to try
+#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 %ifarch ppc 
+BuildRequires: setarch
+%define setarch setarch %{_target_cpu}
 %undefine sbcl_bootstrap
-%define sbcl_bootstrap_src -a 12
+%define sbcl_bootstrap_src -a 30 
 %endif
 %endif
 
@@ -47,6 +51,7 @@ Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.4-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 
+BuildRequires: setarch
 %{?sbcl_bootstrap:BuildRequires: %{?sbcl_bootstrap}}
 
 Requires(post): /sbin/install-info
@@ -105,10 +110,12 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
 %{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define setarch ./my_setarch
+%define my_setarch ./my_setarch
 %endif
 
-%{?setarch} ./make.sh %{?bootstrap}
+# setting SBCL_ARCH couldn't hurt, esp for ppc, might avoid the need for the setarch call
+export SBCL_ARCH=%{_target_cpu}
+%{?setarch} %{?my_setarch} ./make.sh %{?bootstrap}
 
 # docs
 make -C doc/manual html info
@@ -165,6 +172,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-3
+- ppc needs SBCL_ARCH and(or?) setarch
+
 * Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-2
 - 0.9.5
 - use native sbcl bootstraps, when available (ie, %%{ix86},x86_64)
