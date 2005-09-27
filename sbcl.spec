@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.17 2005/09/27 18:54:20 rdieter Exp $
+# $Id: sbcl.spec,v 1.18 2005/09/27 19:09:05 rdieter Exp $
 
 ## Default to using a local bootstrap, 
 ## define one of the following to override 
@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -113,8 +113,9 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %define my_setarch ./my_setarch
 %endif
 
-# setting SBCL_ARCH couldn't hurt, esp for ppc, might avoid the need for the setarch call
+%ifarch ppc
 export SBCL_ARCH=%{_target_cpu}
+%endif
 %{?setarch} %{?my_setarch} ./make.sh %{?bootstrap}
 
 # docs
@@ -172,7 +173,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-3
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-4
 - ppc needs SBCL_ARCH and(or?) setarch
 
 * Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-2
