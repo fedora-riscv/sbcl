@@ -1,9 +1,9 @@
-# $Id: sbcl.spec,v 1.22 2005/09/27 20:10:04 rdieter Exp $
+# $Id: sbcl.spec,v 1.23 2005/09/28 01:23:45 rdieter Exp $
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 7%{?dist}
+Release: 8%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -165,6 +165,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-8
+- respin (fc3/fc4)
+
 * Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-7
 - drop ppc
 - cleaner optflags patch
