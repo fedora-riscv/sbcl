@@ -3,7 +3,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 15%{?dist}
+Release: 15%{?dist}.1
 
 License: BSD/MIT
 Group: 	 Development/Languages
