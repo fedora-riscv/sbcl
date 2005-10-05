@@ -31,7 +31,7 @@
  echo "SBCL has been installed:"
  echo " binary $BUILD_ROOT$INSTALL_ROOT/bin/sbcl"
 -echo " core and contribs in $BUILD_ROOT$INSTALL_ROOT/lib/sbcl/"
-+echo " core and contribs in $BUILD_ROOT$LIB_DIR"
++echo " core and contribs in $BUILD_ROOT$LIB_DIR/sbcl"
  
  # Installing manual & misc bits of documentation
  #

@@ -1,0 +1,28 @@
+--- sbcl-0.9.5/make.sh.verbose-build	2005-09-21 10:00:33.000000000 -0500
++++ sbcl-0.9.5/make.sh	2005-09-28 11:42:06.353251776 -0500
+@@ -70,7 +70,7 @@
+ # If you're cross-compiling, you should probably just walk through the
+ # make-config.sh script by hand doing the right thing on both the host
+ # and target machines.
+-sh make-config.sh
++sh -x make-config.sh
+ 
+ # Enforce the source policy for no bogus whitespace
+ tools-for-build/canonicalize-whitespace
+@@ -102,11 +102,11 @@
+ # Or, if you can set up the files somewhere shared (with NFS, AFS, or
+ # whatever) between the host machine and the target machine, the basic
+ # procedure above should still work, but you can skip the "copy" steps.
+-time sh make-host-1.sh
+-time sh make-target-1.sh
+-time sh make-host-2.sh
+-time sh make-target-2.sh
+-time sh make-target-contrib.sh
++time sh -x make-host-1.sh
++time sh -x make-target-1.sh
++time sh -x make-host-2.sh
++time sh -x make-target-2.sh
++time sh -x make-target-contrib.sh
+ 
+ NCONTRIBS=`find contrib -name Makefile -print | wc -l`
+ NPASSED=`find contrib -name test-passed -print | wc -l`
