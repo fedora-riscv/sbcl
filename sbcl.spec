@@ -1,19 +1,28 @@
-# $Id: sbcl.spec,v 1.23 2005/09/28 01:23:45 rdieter Exp $
+# $Id: sbcl.spec,v 1.24 2005/10/05 12:15:10 rdieter Exp $
+
+# build only a minimal sbcl whose sole-purpose is to be bootstrap
+# for a future sbcl build
+#define min_bootstrap 1
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.5
-Release: 8%{?dist}
+Release: 15%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+#ExclusiveArch: ppc
 ExclusiveArch: %{ix86} x86_64
 
+# Pre-generated html docs (not used)
+#Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
+Source2: customize-target-features.lisp 
+
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.5-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -31,14 +40,16 @@ BuildRequires: sbcl
 ## ppc section
 # Latest powerpc-linux bootstrap, busted:
 # buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
+Source35: ppc-linux-mcontext.h
 %ifarch ppc 
 %define sbcl_arch ppc
 %define sbcl_bootstrap_src -a 30
 BuildRequires: setarch
 %define setarch setarch %{_target_cpu}
+%define min_bootstrap 1
 %endif
 
 Source100: my_setarch.c
@@ -47,12 +58,16 @@ Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
+Patch5: sbcl-0.9.5-make-config-fix.patch
+Patch6: sbcl-0.9.5-verbose-build.patch
+Patch7: sbcl-0.9.5-stdlib_h.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
+BuildRequires: time
 
 %description
 Steel Bank Common Lisp (SBCL) is a Open Source development environment
@@ -63,24 +78,32 @@ interpreter, and debugger.
 %prep
 %setup -q %{?sbcl_bootstrap_src} 
 
+# Handle pre-generated docs
+if [ -d %{name}-%{version}/doc/manual ]; then
+  mv %{name}-%{version}/doc/manual/* doc/manual/
+fi
+
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
 %patch1 -p0 -b .default-sbcl-home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
+%patch5 -p1 -b .make-config-fix
+%patch6 -p1 -b .verbose-build
+%patch7 -p1 -b .stdlib_h
 
-# http://article.gmane.org/gmane.lisp.steel-bank.general/340
-# enable threads (was only for >= 2.6, but code has checks to disable for <= 2.4)
-## FIXME(?): per section 2.2 of INSTALL, should create/use customize-target-features.lisp
-## to customize features -- Rex
-#define kernel_ver %(uname -r | cut -d- -f1 | cut -d. -f-2 )
-#if "%{?kernel_ver}" >= "2.6"
+# Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
+cp %{SOURCE2} ./customize-target-features.lisp
 %endif
-#endif
 
+%ifarch ppc
+cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
+%endif
+
+# "install" local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
@@ -89,34 +112,43 @@ INSTALL_ROOT=`pwd`/../sbcl-bootstrap ./install.sh
 popd
 %endif
 
-# CVS crud 
-find . -name CVS -type d | xargs rm -rf
-find . -name '.cvsignore' | xargs rm -f
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
 
 
 %build
-export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 
+# setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
-
-%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define my_setarch ./my_setarch
 %endif
 
+# my_setarch, to set personality, (about) the same as setarch -R, 
+# but usable on fc3 too
+%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+%define my_setarch ./my_setarch
+
+# trick contrib/ modules to use optflags too 
+export EXTRA_CFLAGS="$RPM_OPT_FLAGS"
+export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} ./make.sh %{?bootstrap}
+%{?setarch} %{?my_setarch} sh -x ./make.sh %{?bootstrap}
 
 # docs
+%if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
+%endif
 
 
 %check || :
 pushd tests 
-%{?setarch} sh ./run-tests.sh
+# Only x86 builds are expected to pass all
+%ifarch %{ix86} x86_64
+%{?setarch} sh ./run-tests.sh ||:
+%else
+%{?setarch} sh ./run-tests.sh ||:
+%endif
 popd
 
 
@@ -124,40 +156,52 @@ popd
 rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
-unset SBCL_HOME ||:
-export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix}
-export LIB_DIR=$RPM_BUILD_ROOT%{_libdir}
-sh ./install.sh
+
+unset SBCL_HOME 
+export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
+export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
+sh -x ./install.sh 
 
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
 rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
-# from make check
-find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
+# CVS crud 
+find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
+find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
+# 'test-passed' files from make check (leave these in, for now -- Rex)
+# find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
 
 
+%if "%{?min_bootstrap}" == "%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
-
 
 %postun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
 fi
+%else
+%pre
+# We *could* check for only-on-upgrade, but why bother?   (-:
+/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
+/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
+%endif
 
 
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc SUPPORT STYLE PRINCIPLES
-%doc doc/manual/sbcl
-%doc doc/manual/asdf
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
+%if "%{?min_bootstrap}" == "%{nil}"
+%doc doc/manual/sbcl
+%doc doc/manual/asdf
 %{_infodir}/*
+%endif
 
 
 %clean
@@ -165,6 +209,14 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Sep 29 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-15
+- enable sb-thread
+- set EXTRA_CFLAGS to so optflags are used for building contrib/ too
+- hope that a rebuild will include missing sb-posix (bz #169506)
+
+* Wed Sep 28 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-14
+- more ppc work
+
 * Tue Sep 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-8
 - respin (fc3/fc4)
 
