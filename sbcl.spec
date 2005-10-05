@@ -168,7 +168,7 @@ rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
 # CVS crud 
 find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
 find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
-# 'test-passed' files from make check (leave these in, for now -- Rex)
+# 'test-passed' files from %%check (leave these in, for now -- Rex)
 # find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
 
 
