@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.24 2005/10/05 12:15:10 rdieter Exp $
+# $Id: sbcl.spec,v 1.25 2005/10/05 12:16:32 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -168,7 +168,7 @@ rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
 # CVS crud 
 find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
 find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
-# 'test-passed' files from make check (leave these in, for now -- Rex)
+# 'test-passed' files from %%check (leave these in, for now -- Rex)
 # find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
 
 
