@@ -4,10 +4,13 @@
 # for a future sbcl build
 #define min_bootstrap 1
 
+# define to enable verbose build for debugging
+#define verbose 1 
+
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -59,6 +62,7 @@ Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 Patch5: sbcl-0.9.5-make-config-fix.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
+Patch7: sbcl-0.9.5-stdlib_h.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -88,7 +92,8 @@ fi
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
 %patch5 -p1 -b .make-config-fix
-%patch6 -p1 -b .verbose-build
+%{?verbose:%patch6 -p1 -b .verbose-build}
+%patch7 -p1 -b .stdlib_h
 
 # Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -104,8 +109,7 @@ cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
-chmod +x install.sh
-INSTALL_ROOT=`pwd`/../sbcl-bootstrap ./install.sh
+INSTALL_ROOT=`pwd`/../sbcl-bootstrap sh %{?verbose:-x} ./install.sh
 popd
 %endif
 
@@ -114,6 +118,8 @@ find . -name '*.c' | xargs chmod 644
 
 
 %build
+
+export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
 
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
@@ -126,10 +132,10 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #define my_setarch ./my_setarch
 
 # trick contrib/ modules to use optflags too 
-export EXTRA_CFLAGS="$RPM_OPT_FLAGS"
+export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} sh -x ./make.sh %{?bootstrap}
+%{?setarch} %{?my_setarch} sh %{?verbose:-x} ./make.sh %{?bootstrap}
 
 # docs
 %if "%{?min_bootstrap}" == "%{nil}"
@@ -160,7 +166,7 @@ mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
 unset SBCL_HOME 
 export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
 export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
-sh -x ./install.sh 
+sh %{?verbose:-x} ./install.sh 
 
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
@@ -209,6 +215,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-2
+- CFLAGS += -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+- (re)add/use stdlib_h patch (ppc)
+- disable verbose build.log
+
 * Wed Oct 26 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-1
 - 0.9.6
 - %%check: verify presence of sb-posix
