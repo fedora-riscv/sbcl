@@ -14,7 +14,6 @@ Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#ExclusiveArch: ppc
 ExclusiveArch: %{ix86} x86_64
 
 # Pre-generated html docs (not used)
