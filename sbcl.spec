@@ -1,9 +1,16 @@
 # $Id: sbcl.spec,v 1.8 2003/11/12 16:47:44 rexdieter Exp $
 
+# build only a minimal sbcl whose sole-purpose is to be bootstrap
+# for a future sbcl build
+#define min_bootstrap 1
+
+# define to enable verbose build for debugging
+#define verbose 1 
+
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.5
-Release: 15%{?dist}.2
+Version: 0.9.6
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -38,11 +45,13 @@ BuildRequires: sbcl
 Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
+Source35: ppc-linux-mcontext.h
 %ifarch ppc 
 %define sbcl_arch ppc
 %define sbcl_bootstrap_src -a 30
 BuildRequires: setarch
 %define setarch setarch %{_target_cpu}
+%define min_bootstrap 1
 %endif
 
 Source100: my_setarch.c
@@ -83,7 +92,7 @@ fi
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
 %patch5 -p1 -b .make-config-fix
-%patch6 -p1 -b .verbose-build
+%{?verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .stdlib_h
 
 # Enable sb-thread
@@ -92,12 +101,15 @@ fi
 cp %{SOURCE2} ./customize-target-features.lisp
 %endif
 
+%ifarch ppc
+cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
+%endif
+
 # "install" local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
-chmod +x install.sh
-INSTALL_ROOT=`pwd`/../sbcl-bootstrap ./install.sh
+INSTALL_ROOT=`pwd`/../sbcl-bootstrap sh %{?verbose:-x} ./install.sh
 popd
 %endif
 
@@ -107,35 +119,42 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
+export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-# my_setarch, to set personality, (about) the same as setarch -R, 
-# but usable on fc3 too
-%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define my_setarch ./my_setarch
+# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
+#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+#define my_setarch ./my_setarch
 
 # trick contrib/ modules to use optflags too 
-export EXTRA_CFLAGS="$RPM_OPT_FLAGS"
+export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} sh -x ./make.sh %{?bootstrap}
+%{?setarch} %{?my_setarch} sh %{?verbose:-x} ./make.sh %{?bootstrap}
 
 # docs
+%if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
+%endif
 
 
-%check || :
+%check
+# santity check, did sb-posix get built/included?
+# http://bugzilla.redhat.com/bugzilla/169506
+SB_POSIX=%{_libdir}/sbcl/sb-posix
+if [ ! -d $RPM_BUILD_ROOT${SB_POSIX} ]; then
+  echo "%SB_POSIX awol!"
+  exit 1
+fi
 pushd tests 
 # Only x86 builds are expected to pass all
-%ifarch %{ix86} x86_64
+# Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} sh ./run-tests.sh ||:
-%else
-%{?setarch} sh ./run-tests.sh ||:
-%endif
 popd
 
 
@@ -147,7 +166,7 @@ mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
 unset SBCL_HOME 
 export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
 export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
-sh -x ./install.sh 
+sh %{?verbose:-x} ./install.sh 
 
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
@@ -155,32 +174,40 @@ rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
 # CVS crud 
 find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
 find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
-# 'test-passed' files from make check (leave these in, for now -- Rex)
+# 'test-passed' files from %%check (leave these in, for now -- Rex)
 # find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
 
 
+%if "%{?min_bootstrap}" == "%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
-
 
 %postun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
 fi
+%else
+%pre
+# min_bootstrap: We *could* check for only-on-upgrade, but why bother?   (-:
+/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
+/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
+%endif
 
 
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc SUPPORT STYLE PRINCIPLES
-%doc doc/manual/sbcl
-%doc doc/manual/asdf
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
+%if "%{?min_bootstrap}" == "%{nil}"
+%doc doc/manual/sbcl
+%doc doc/manual/asdf
 %{_infodir}/*
+%endif
 
 
 %clean
@@ -188,6 +215,15 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-2
+- CFLAGS += -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
+- (re)add/use stdlib_h patch (ppc)
+- disable verbose build.log
+
+* Wed Oct 26 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-1
+- 0.9.6
+- %%check: verify presence of sb-posix
+
 * Thu Sep 29 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-15
 - enable sb-thread
 - set EXTRA_CFLAGS to so optflags are used for building contrib/ too

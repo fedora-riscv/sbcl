@@ -5,7 +5,7 @@
  # make-config.sh script by hand doing the right thing on both the host
  # and target machines.
 -sh make-config.sh
-+sh -x make-config.sh ||:
++sh -x make-config.sh
  
  # Enforce the source policy for no bogus whitespace
  tools-for-build/canonicalize-whitespace

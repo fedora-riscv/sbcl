@@ -1,5 +1,5 @@
 --- sbcl-0.9.5/make-config.sh.make-config-fix	2005-09-21 10:00:33.000000000 -0500
-+++ sbcl-0.9.5/make-config.sh	2005-09-28 11:42:29.135788304 -0500
++++ sbcl-0.9.5/make-config.sh	2005-09-29 14:58:25.266788248 -0500
 @@ -208,7 +208,7 @@
      # cross-compilers!
      #
@@ -16,7 +16,7 @@
 -    $GNUMAKE -C tools-for-build where-is-mcontext -I src/runtime
 -    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h
 +    $GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
-+    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || echo "error running where-is-mcontext"
++    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || echo "error running where-is-mcontext, using backup copy"; cat src/runtime/ppc-linux-mcontext.h; cat /usr/include/sys/ucontext.h ; cp src/runtime/ppc-linux-mcontext.h.BAK src/runtime/ppc-linux-mcontext.h ||:
  elif [ "$sbcl_arch" = "ppc" -a "$sbcl_os" = "darwin" ]; then
      printf ' :stack-allocatable-closures' >> $ltf
      # We provide a dlopen shim, so a little lie won't hurt
