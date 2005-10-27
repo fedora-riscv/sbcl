@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.26 2005/10/27 16:15:20 rdieter Exp $
+# $Id: sbcl.spec,v 1.27 2005/10/27 16:17:54 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -14,7 +14,6 @@ Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#ExclusiveArch: ppc
 ExclusiveArch: %{ix86} x86_64
 
 # Pre-generated html docs (not used)
