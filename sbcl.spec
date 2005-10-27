@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.25 2005/10/05 12:16:32 rdieter Exp $
+# $Id: sbcl.spec,v 1.26 2005/10/27 16:15:20 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -6,8 +6,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.5
-Release: 15%{?dist}
+Version: 0.9.6
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -60,7 +60,6 @@ Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 Patch5: sbcl-0.9.5-make-config-fix.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
-Patch7: sbcl-0.9.5-stdlib_h.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -91,7 +90,6 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %patch5 -p1 -b .make-config-fix
 %patch6 -p1 -b .verbose-build
-%patch7 -p1 -b .stdlib_h
 
 # Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -124,10 +122,9 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-# my_setarch, to set personality, (about) the same as setarch -R, 
-# but usable on fc3 too
-%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define my_setarch ./my_setarch
+# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
+#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+#define my_setarch ./my_setarch
 
 # trick contrib/ modules to use optflags too 
 export EXTRA_CFLAGS="$RPM_OPT_FLAGS"
@@ -141,14 +138,18 @@ make -C doc/manual html info
 %endif
 
 
-%check || :
+%check
+# santity check, did sb-posix get built/included?
+# http://bugzilla.redhat.com/bugzilla/169506
+SB_POSIX=%{_libdir}/sbcl/sb-posix
+if [ ! -d $RPM_BUILD_ROOT${SB_POSIX} ]; then
+  echo "%SB_POSIX awol!"
+  exit 1
+fi
 pushd tests 
 # Only x86 builds are expected to pass all
-%ifarch %{ix86} x86_64
+# Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} sh ./run-tests.sh ||:
-%else
-%{?setarch} sh ./run-tests.sh ||:
-%endif
 popd
 
 
@@ -184,7 +185,7 @@ if [ $1 -eq 0 ]; then
 fi
 %else
 %pre
-# We *could* check for only-on-upgrade, but why bother?   (-:
+# min_bootstrap: We *could* check for only-on-upgrade, but why bother?   (-:
 /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
 /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
 %endif
@@ -209,6 +210,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Oct 26 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-1
+- 0.9.6
+- %%check: verify presence of sb-posix
+
 * Thu Sep 29 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.5-15
 - enable sb-thread
 - set EXTRA_CFLAGS to so optflags are used for building contrib/ too
