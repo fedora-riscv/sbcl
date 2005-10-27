@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.29 2005/10/27 17:47:27 rdieter Exp $
+# $Id: sbcl.spec,v 1.30 2005/10/27 18:46:20 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -117,7 +117,7 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
 
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
@@ -213,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-4
+- drop -D_FILE_OFFSET_BITS=64
+
 * Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-3
 - drop upstreamed stdlib_h patch
 
