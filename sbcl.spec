@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.6
-Release: 2%{?dist}.1
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -62,7 +62,6 @@ Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
 Patch5: sbcl-0.9.5-make-config-fix.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
-Patch7: sbcl-0.9.5-stdlib_h.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -93,7 +92,6 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %patch5 -p1 -b .make-config-fix
 %{?verbose:%patch6 -p1 -b .verbose-build}
-%patch7 -p1 -b .stdlib_h
 
 # Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -215,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-3
+- drop upstreamed stdlib_h patch
+
 * Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-2
 - CFLAGS += -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 - (re)add/use stdlib_h patch (ppc)
