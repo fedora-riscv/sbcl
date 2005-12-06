@@ -5,12 +5,15 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-#define verbose 1 
+%define sbcl_verbose 1 
+
+# shell to use
+%define sbcl_shell /bin/bash -x
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.6
-Release: 5%{?dist}
+Version: 0.9.7
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -93,7 +96,7 @@ fi
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
 %patch5 -p1 -b .make-config-fix
-%{?verbose:%patch6 -p1 -b .verbose-build}
+%{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
 # Enable sb-thread
@@ -110,7 +113,7 @@ cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
-INSTALL_ROOT=`pwd`/../sbcl-bootstrap sh %{?verbose:-x} ./install.sh
+INSTALL_ROOT=`pwd`/../sbcl-bootstrap %{?sbcl_shell} ./install.sh
 popd
 %endif
 
@@ -141,7 +144,7 @@ touch contrib/sb-posix/test-passed
 export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} sh %{?verbose:-x} ./make.sh %{?bootstrap}
+%{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
 
 
@@ -162,7 +165,7 @@ fi
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
-%{?setarch} sh ./run-tests.sh ||:
+%{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 
 
@@ -174,7 +177,7 @@ mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
 unset SBCL_HOME 
 export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
 export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
-sh %{?verbose:-x} ./install.sh 
+%{?sbcl_shell} ./install.sh 
 
 ## Unpackaged files
 rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
@@ -182,8 +185,8 @@ rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
 # CVS crud 
 find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
 find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
-# 'test-passed' files from %%check (leave these in, for now -- Rex)
-# find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -f
+# 'test-passed' files from %%check
+find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -vf
 
 
 %if "%{?min_bootstrap}" == "%{nil}"
@@ -223,8 +226,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Nov 28 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.7-1
+- 0.9.7
+
 * Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-5
-- override friggen sb-posix test failure(s).
+- override (bogus/mock-induced) sb-posix test failure(s).
 
 * Thu Oct 27 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.6-4
 - drop -D_FILE_OFFSET_BITS=64
