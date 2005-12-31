@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.31 2005/12/05 14:59:39 rdieter Exp $
+# $Id: sbcl.spec,v 1.32 2005/12/31 21:03:00 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.7
+Version: 0.9.8
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -226,6 +226,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sat Dec 31 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.8-1
+- 0.9.8
+
 * Mon Nov 28 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.7-1
 - 0.9.7
 
