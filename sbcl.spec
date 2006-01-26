@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.8
+Version: 0.9.9
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -27,7 +27,7 @@ ExclusiveArch: %{ix86} x86_64
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.5-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -35,7 +35,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.4-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -45,7 +45,7 @@ BuildRequires: sbcl
 ## ppc section
 # Latest powerpc-linux bootstrap, busted:
 # buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 Source35: ppc-linux-mcontext.h
@@ -66,7 +66,7 @@ Patch4: sbcl-0.9.4-LIB_DIR.patch
 Patch5: sbcl-0.9.5-make-config-fix.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
-Patch7: sbcl-0.9.6-permissive.patch
+Patch7: sbcl-0.9.9-permissive.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -226,6 +226,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jan 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.9-1
+- 0.9.9
+
 * Sat Dec 31 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.8-1
 - 0.9.8
 
