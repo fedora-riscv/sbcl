@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.32 2005/12/31 21:03:00 rdieter Exp $
+# $Id: sbcl.spec,v 1.33 2006/01/26 19:47:49 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.8
+Version: 0.9.9
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -66,7 +66,7 @@ Patch4: sbcl-0.9.4-LIB_DIR.patch
 Patch5: sbcl-0.9.5-make-config-fix.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
-Patch7: sbcl-0.9.6-permissive.patch
+Patch7: sbcl-0.9.9-permissive.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -226,6 +226,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jan 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.9-1
+- 0.9.9
+
 * Sat Dec 31 2005 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.8-1
 - 0.9.8
 
