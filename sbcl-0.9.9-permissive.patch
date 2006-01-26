@@ -1,0 +1,11 @@
+--- sbcl-0.9.9/make-target-contrib.sh.permissive	2006-01-24 11:14:48.000000000 -0600
++++ sbcl-0.9.9/make-target-contrib.sh	2006-01-26 13:45:41.000000000 -0600
+@@ -51,7 +51,7 @@
+ for i in contrib/*; do
+     test -d $i && test -f $i/Makefile || continue;
+     # export INSTALL_DIR=$SBCL_HOME/`basename $i `
+-    test -f $i/test-passed && rm $i/test-passed
++    # test -f $i/test-passed && rm $i/test-passed
+     $GNUMAKE -C $i test && touch $i/test-passed
+ done
+ 
