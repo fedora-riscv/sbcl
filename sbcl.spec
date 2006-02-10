@@ -1,19 +1,19 @@
-# $Id: sbcl.spec,v 1.34 2006/01/26 19:52:39 rdieter Exp $
+# $Id: sbcl.spec,v 1.35 2006/02/10 13:20:21 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+#define sbcl_verbose 1 
 
 # shell to use
-%define sbcl_shell /bin/bash -x
+#define sbcl_shell /bin/bash -x
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.9
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -226,6 +226,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Feb 10 2006 Rex Dieter <rexdieter[AT]users.sf.net>
+- fc5: gcc/glibc respin
+- disable verbose build options
+
 * Thu Jan 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.9-1
 - 0.9.9
 
