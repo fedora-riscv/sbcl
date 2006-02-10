@@ -9,11 +9,12 @@
 
 # shell to use
 #define sbcl_shell /bin/bash -x
+%define sbcl_shell /bin/bash 
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.9
-Release: 1%{?dist}.1
+Release: 1%{?dist}.2
 
 License: BSD/MIT
 Group: 	 Development/Languages
