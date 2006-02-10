@@ -1,4 +1,4 @@
-# $Id: sbcl.spec,v 1.35 2006/02/10 13:20:21 rdieter Exp $
+# $Id: sbcl.spec,v 1.36 2006/02/10 13:47:42 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -9,11 +9,12 @@
 
 # shell to use
 #define sbcl_shell /bin/bash -x
+%define sbcl_shell /bin/bash 
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.9
-Release: 1%{?dist}.1
+Release: 1%{?dist}.2
 
 License: BSD/MIT
 Group: 	 Development/Languages
