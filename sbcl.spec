@@ -230,6 +230,8 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Mon Feb 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.10-1
 - 0.9.10
+- update/fix make-config-ppc patch (still broken, #177029)
+- cleanup bootstrap bits
 
 * Fri Feb 10 2006 Rex Dieter <rexdieter[AT]users.sf.net>
 - fc5: gcc/glibc respin
