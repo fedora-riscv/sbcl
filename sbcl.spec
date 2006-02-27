@@ -1,18 +1,18 @@
-# $Id: sbcl.spec,v 1.8 2003/11/12 16:47:44 rexdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+#define sbcl_verbose 1 
 
 # shell to use
-%define sbcl_shell /bin/bash -x
+#define sbcl_shell /bin/bash -x
+%define sbcl_shell /bin/bash 
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.9
+Version: 0.9.10
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -27,24 +27,26 @@ ExclusiveArch: %{ix86} x86_64
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
+# or
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-linux-binary.tar.bz2
 #define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-BuildRequires: sbcl
-#define sbcl_bootstrap_src -a 20 
+#BuildRequires: sbcl
+# or
+Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-64-linux-binary.tar.bz2
+%define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
-# Latest powerpc-linux bootstrap, busted:
-# buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
+# Latest powerpc-linux bootstrap build fails:
+# http://bugzilla.redhat.com/bugzilla/177029 
 #Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
@@ -63,7 +65,7 @@ Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
-Patch5: sbcl-0.9.5-make-config-fix.patch
+Patch5: sbcl-0.9.10-make-config-ppc.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
@@ -95,7 +97,7 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
-%patch5 -p1 -b .make-config-fix
+%patch5 -p1 -b .make-config-ppc
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
@@ -226,6 +228,15 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Feb 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.10-1
+- 0.9.10
+- update/fix make-config-ppc patch (still broken, #177029)
+- cleanup bootstrap bits
+
+* Fri Feb 10 2006 Rex Dieter <rexdieter[AT]users.sf.net>
+- fc5: gcc/glibc respin
+- disable verbose build options
+
 * Thu Jan 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.9-1
 - 0.9.9
 
