@@ -1,6 +1,6 @@
---- sbcl-0.9.5/make-config.sh.make-config-fix	2005-09-21 10:00:33.000000000 -0500
-+++ sbcl-0.9.5/make-config.sh	2005-09-29 14:58:25.266788248 -0500
-@@ -208,7 +208,7 @@
+--- sbcl-0.9.10/make-config.sh.make-config-ppc	2006-02-23 13:57:56.000000000 -0600
++++ sbcl-0.9.10/make-config.sh	2006-02-27 07:00:26.000000000 -0600
+@@ -273,7 +273,7 @@
      # cross-compilers!
      #
      # FIXME: integrate to grovel-features, mayhaps
@@ -9,14 +9,14 @@
      tools-for-build/determine-endianness >> $ltf
  elif [ "$sbcl_arch" = "ppc" -a "$sbcl_os" = "linux" ]; then
      # Use a C program to detect which kind of glibc we're building on,
-@@ -217,8 +217,8 @@
+@@ -282,8 +282,8 @@
      #
      # FIXME: integrate to grovel-features., maypahps
-     printf ' :stack-allocatable-closures' >> $ltf
+     printf ' :gencgc :stack-allocatable-closures :linkage-table' >> $ltf
 -    $GNUMAKE -C tools-for-build where-is-mcontext -I src/runtime
 -    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h
 +    $GNUMAKE -C tools-for-build where-is-mcontext -I ../src/runtime
-+    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || echo "error running where-is-mcontext, using backup copy"; cat src/runtime/ppc-linux-mcontext.h; cat /usr/include/sys/ucontext.h ; cp src/runtime/ppc-linux-mcontext.h.BAK src/runtime/ppc-linux-mcontext.h ||:
++    tools-for-build/where-is-mcontext > src/runtime/ppc-linux-mcontext.h || (echo "error running where-is-mcontext"; exit 1)
  elif [ "$sbcl_arch" = "ppc" -a "$sbcl_os" = "darwin" ]; then
-     printf ' :stack-allocatable-closures' >> $ltf
+     printf ' :gencgc :stack-allocatable-closures' >> $ltf
      # We provide a dlopen shim, so a little lie won't hurt
