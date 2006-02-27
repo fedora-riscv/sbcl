@@ -1,4 +1,3 @@
-# $Id: sbcl.spec,v 1.36 2006/02/10 13:47:42 rdieter Exp $
 
 # build only a minimal sbcl whose sole-purpose is to be bootstrap
 # for a future sbcl build
@@ -13,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.9
-Release: 1%{?dist}.2
+Version: 0.9.10
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -28,7 +27,7 @@ ExclusiveArch: %{ix86} x86_64
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -36,7 +35,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -44,8 +43,8 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-# Latest powerpc-linux bootstrap, busted:
-# buildsys.fedoraproject.org/logs/development/1131-sbcl-0.9.4-14.fc5/ppc/build.log
+# Latest powerpc-linux bootstrap build fails:
+# http://bugzilla.redhat.com/bugzilla/177029 
 #Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
 # another possible ppc bootstrap to try
 #Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
@@ -227,6 +226,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Feb 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.10-1
+- 0.9.10
+
 * Fri Feb 10 2006 Rex Dieter <rexdieter[AT]users.sf.net>
 - fc5: gcc/glibc respin
 - disable verbose build options
