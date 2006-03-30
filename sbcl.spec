@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.10
+Version: 0.9.11
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -31,17 +31,17 @@ Source2: customize-target-features.lisp
 %define sbcl_arch x86
 BuildRequires: sbcl
 # or
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
 #define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
 %ifarch x86_64
 %define sbcl_arch x86-64
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.9-x86-64-linux-binary.tar.bz2
-%define sbcl_bootstrap_src -a 20 
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
+#define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
@@ -228,6 +228,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Mar 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.11-1
+- 0.9.11
+
 * Mon Feb 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.10-1
 - 0.9.10
 - update/fix make-config-ppc patch (still broken, #177029)
