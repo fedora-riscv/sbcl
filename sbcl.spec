@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.11
+Version: 0.9.12
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -26,12 +26,22 @@ ExclusiveArch: %{ix86} x86_64
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
+## Bootstraps
+# %{ix86}
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
+# x86_64
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
+# ppc
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
+# another possible ppc bootstrap to try
+#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
+
+
 ## x86 section
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
 # or
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
 #define sbcl_bootstrap_src -a 10 
 %endif
 
@@ -47,16 +57,10 @@ BuildRequires: sbcl
 ## ppc section
 # Latest powerpc-linux bootstrap build fails:
 # http://bugzilla.redhat.com/bugzilla/177029 
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.8.15-powerpc-linux-binary.tar.bz2
-# another possible ppc bootstrap to try
-#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 Source35: ppc-linux-mcontext.h
 %ifarch ppc 
 %define sbcl_arch ppc
 %define sbcl_bootstrap_src -a 30
-BuildRequires: setarch
-%define setarch setarch %{_target_cpu}
-%define min_bootstrap 1
 %endif
 
 Source100: my_setarch.c
@@ -65,7 +69,7 @@ Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.5-optflags.patch
 Patch4: sbcl-0.9.4-LIB_DIR.patch
-Patch5: sbcl-0.9.10-make-config-ppc.patch
+#Patch5: sbcl-0.9.10-make-config-ppc.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
@@ -97,7 +101,7 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
-%patch5 -p1 -b .make-config-ppc
+#patch5 -p1 -b .make-config-ppc
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
@@ -228,6 +232,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1
+- 0.9.12
+
 * Mon Mar 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.11-1
 - 0.9.11
 
