@@ -4,40 +4,28 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-#define sbcl_verbose 1 
-
-# shell to use
-#define sbcl_shell /bin/bash -x
-%define sbcl_shell /bin/bash 
+%define sbcl_verbose 1 
+%define sbcl_shell /bin/bash -x
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.12
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64
+#ExclusiveArch: %{ix86} x86_64
+ExclusiveArch: ppc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
-## Bootstraps
-# %{ix86}
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
-# x86_64
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
-# ppc
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
-# another possible ppc bootstrap to try
-#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
-
-
 ## x86 section
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -46,6 +34,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -55,6 +44,9 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
+# another possible ppc bootstrap to try
+#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
 # Latest powerpc-linux bootstrap build fails:
 # http://bugzilla.redhat.com/bugzilla/177029 
 Source35: ppc-linux-mcontext.h
@@ -232,6 +224,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net 0.9.12-1.1
+- try re-enabling ppc build
+
 * Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1
 - 0.9.12
 
