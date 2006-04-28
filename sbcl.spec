@@ -4,21 +4,20 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
-%define sbcl_shell /bin/bash -x
+#define sbcl_verbose 1 
+%define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.12
-Release: 1%{?dist}.1
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#ExclusiveArch: %{ix86} x86_64
-ExclusiveArch: ppc
+ExclusiveArch: %{ix86} x86_64 ppc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -44,15 +43,12 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
-# another possible ppc bootstrap to try
-#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
-# Latest powerpc-linux bootstrap build fails:
-# http://bugzilla.redhat.com/bugzilla/177029 
-Source35: ppc-linux-mcontext.h
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-%define sbcl_bootstrap_src -a 30
+BuildRequires: sbcl
+# or
+#define sbcl_bootstrap_src -a 30
 %endif
 
 Source100: my_setarch.c
@@ -101,10 +97,6 @@ fi
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 cp %{SOURCE2} ./customize-target-features.lisp
-%endif
-
-%ifarch ppc
-cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
 %endif
 
 # "install" local bootstrap
@@ -224,7 +216,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net 0.9.12-1.1
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-2
+- respin, using new ppc bootstrap 
+
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1.1
 - try re-enabling ppc build
 
 * Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1
