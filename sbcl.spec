@@ -9,8 +9,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.12
-Release: 2%{?dist}
+Version: 0.9.13
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -56,8 +56,8 @@ Source100: my_setarch.c
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.5-optflags.patch
-Patch4: sbcl-0.9.4-LIB_DIR.patch
-#Patch5: sbcl-0.9.10-make-config-ppc.patch
+Patch4: sbcl-0.9.13-LIB_DIR.patch
+
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
@@ -216,6 +216,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue May 30 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.13-1
+- 0.9.13
+
 * Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-2
 - respin, using new ppc bootstrap 
 
