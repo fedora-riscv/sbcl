@@ -1,6 +1,6 @@
---- sbcl-0.9.4/install.sh.lib64	2005-05-28 04:00:34.000000000 -0500
-+++ sbcl-0.9.4/install.sh	2005-09-12 14:00:27.310267719 -0500
-@@ -13,10 +13,11 @@
+--- sbcl-0.9.13/install.sh.LIB_DIR	2006-05-17 07:06:08.000000000 -0500
++++ sbcl-0.9.13/install.sh	2006-05-30 15:09:38.000000000 -0500
+@@ -23,10 +23,11 @@
  MAN_DIR=${MAN_DIR-$INSTALL_ROOT/share/man}
  INFO_DIR=${INFO_DIR-$INSTALL_ROOT/share/info}
  DOC_DIR=${DOC_DIR-$INSTALL_ROOT/share/doc/sbcl}
@@ -13,7 +13,7 @@
     echo SBCL_HOME environment variable is set, and conflicts with INSTALL_ROOT.
     echo Aborting installation.  Unset one or reset the other, then try again
     echo INSTALL_ROOT="$INSTALL_ROOT"
-@@ -37,10 +38,10 @@
+@@ -47,10 +48,10 @@
      exit 1
  fi
  
@@ -26,12 +26,12 @@
      $BUILD_ROOT$MAN_DIR $BUILD_ROOT$MAN_DIR/man1 \
      $BUILD_ROOT$INFO_DIR $BUILD_ROOT$DOC_DIR \
      $BUILD_ROOT$DOC_DIR/html \
-@@ -76,7 +77,7 @@
+@@ -87,7 +88,7 @@
  echo
  echo "SBCL has been installed:"
- echo " binary $BUILD_ROOT$INSTALL_ROOT/bin/sbcl"
+ echo " binary $BUILD_ROOT$INSTALL_ROOT/bin/$RUNTIME"
 -echo " core and contribs in $BUILD_ROOT$INSTALL_ROOT/lib/sbcl/"
-+echo " core and contribs in $BUILD_ROOT$LIB_DIR/sbcl"
++echo " core and contribs in $BUILD_ROOT$LIB_DIR/sbcl" 
  
  # Installing manual & misc bits of documentation
  #
