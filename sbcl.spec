@@ -61,6 +61,8 @@ Patch4: sbcl-0.9.13-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
+# use -fPIC in threads.impure.lisp
+Patch8: sbcl-0.9.13-PIC.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -92,6 +94,7 @@ fi
 #patch5 -p1 -b .make-config-ppc
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch8 -p1 -b .PIC
 
 # Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -216,6 +219,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Jun 20 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.13-3
+- use -fPIC in threads.impure.lisp
+
 * Tue May 30 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.13-2
 - 0.9.13
 
