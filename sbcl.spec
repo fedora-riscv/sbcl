@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.16
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -215,7 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon Aug 28 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-2
+* Mon Aug 28 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-3
 - fc6 respin
 
 * Sun Aug 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-1
