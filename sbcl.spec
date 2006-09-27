@@ -9,8 +9,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.16
-Release: 3%{?dist}
+Version: 0.9.17
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -56,7 +56,7 @@ Source100: my_setarch.c
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-0.9.5-optflags.patch
-Patch4: sbcl-0.9.14-LIB_DIR.patch
+Patch4: sbcl-0.9.17-LIB_DIR.patch
 
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
@@ -215,6 +215,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Sep 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.17-1
+- 0.9.17
+
 * Mon Aug 28 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-3
 - fc6 respin
 
