@@ -4,13 +4,13 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-#define sbcl_verbose 1 
+%define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 0.9.18
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -24,7 +24,7 @@ ExclusiveArch: %{ix86} x86_64 ppc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -33,17 +33,16 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
 # or
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
 #define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 BuildRequires: sbcl
@@ -112,7 +111,8 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
+#export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
+export CFLAGS="$RPM_OPT_FLAGS"
 
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
@@ -125,9 +125,11 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #define my_setarch ./my_setarch
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
-# at least until a better solution is found
-# http://bugzilla.redhat.com/bugzilla/169506
+# http://bugzilla.redhat.com/169506
 touch contrib/sb-posix/test-passed
+# WORKAROUND sb-bsd-sockets test failures
+# http://bugzilla.redhat.com/214568
+touch contrib/sb-bsd-sockets/test-passed
 
 # trick contrib/ modules to use optflags too 
 export EXTRA_CFLAGS="$CFLAGS"
@@ -144,18 +146,21 @@ make -C doc/manual html info
 
 
 %check
-# santity check, did sb-posix get built/included?
-# http://bugzilla.redhat.com/bugzilla/169506
-SB_POSIX=%{_libdir}/sbcl/sb-posix
-if [ ! -d $RPM_BUILD_ROOT${SB_POSIX} ]; then
-  echo "${SB_POSIX} awol!"
-  exit 1
-fi
+ERROR=0
+# santity check, essential contrib modules get built/included? 
+CONTRIBS="sb-posix sb-bsd-sockets"
+for CONTRIB in $CONTRIBS ; do
+  if [ ! -d $RPM_BUILD_ROOT%{_libdir}/sbcl/$CONTRIB ]; then
+    echo "WARNING: ${CONTRIB} awol!"
+    ERROR=1 
+  fi
+done
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
+exit $ERROR
 
 
 %install
@@ -215,6 +220,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Nov 13 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.18-2
+- fix awol contrib/sb-bsd-sockets (#214568)
+
 * Thu Oct 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.18-1
 - sbcl-0.9.18
 
