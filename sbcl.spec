@@ -4,13 +4,13 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+#define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.18
-Release: 2%{?dist}
+Version: 1.0 
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -24,7 +24,7 @@ ExclusiveArch: %{ix86} x86_64 ppc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -91,10 +91,11 @@ fi
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
-# Enable sb-thread
+## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
-cp %{SOURCE2} ./customize-target-features.lisp
+# or
+#install -m644 -p %{SOURCE2} ./customize-target-features.lisp
 %endif
 
 # "install" local bootstrap
@@ -220,6 +221,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
+- sbcl-1.0
+- don't enable sb:thread (for now), to avoid hang in 'make check' tests 
+
 * Mon Nov 13 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.18-2
 - fix awol contrib/sb-bsd-sockets (#214568)
 
