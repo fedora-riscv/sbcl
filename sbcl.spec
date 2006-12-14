@@ -51,7 +51,7 @@ BuildRequires: sbcl
 %endif
 
 ## sparc section
-Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
 %ifarch sparc 
 %define sbcl_arch sparc 
 #BuildRequires: sbcl
