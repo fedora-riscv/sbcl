@@ -1,0 +1,43 @@
+--- sbcl-1.0/src/runtime/Config.x86_64-linux.optflags	2006-11-19 10:38:57.000000000 -0600
++++ sbcl-1.0/src/runtime/Config.x86_64-linux	2006-12-14 08:55:17.000000000 -0600
+@@ -34,7 +34,7 @@
+   OS_LIBS += -lpthread
+ endif
+ 
+-CFLAGS += -fno-omit-frame-pointer
++CFLAGS += -fno-omit-frame-pointer $(RPM_OPT_FLAGS)
+ 
+ GC_SRC = gencgc.c
+ 
+--- sbcl-1.0/src/runtime/Config.sparc-linux.optflags	2005-09-16 08:26:39.000000000 -0500
++++ sbcl-1.0/src/runtime/Config.sparc-linux	2006-12-14 08:57:04.000000000 -0600
+@@ -10,6 +10,7 @@
+ # files for more information.
+ 
+ ASFLAGS = -g -Wall
++CFLAGS += $(RPM_OPT_FLAGS)
+ LINKFLAGS += -v -rdynamic
+ NM = ./linux-nm
+ 
+--- sbcl-1.0/src/runtime/Config.x86-linux.optflags	2006-11-19 10:38:57.000000000 -0600
++++ sbcl-1.0/src/runtime/Config.x86-linux	2006-12-14 08:55:17.000000000 -0600
+@@ -38,6 +38,8 @@
+   OS_LIBS += -lpthread
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.
+--- sbcl-1.0/src/runtime/Config.ppc-linux.optflags	2006-11-19 10:38:57.000000000 -0600
++++ sbcl-1.0/src/runtime/Config.ppc-linux	2006-12-14 08:55:17.000000000 -0600
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g
++CFLAGS += $(RPM_OPT_FLAGS)
+ LINKFLAGS += -v -rdynamic
+ NM = ./linux-nm
+ 
