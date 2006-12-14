@@ -10,14 +10,14 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0 
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 ppc
+ExclusiveArch: %{ix86} x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -49,6 +49,16 @@ BuildRequires: sbcl
 # or
 #define sbcl_bootstrap_src -a 30
 %endif
+
+## sparc section
+Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+%ifarch sparc 
+%define sbcl_arch sparc 
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -a 40 
+%endif
+
 
 Source100: my_setarch.c
 
@@ -221,6 +231,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Dec 14 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-2
+- initial sparc support (bootstrap, optflags)
+
 * Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
 - sbcl-1.0
 - don't enable sb:thread (for now), to avoid hang in 'make check' tests 
