@@ -64,7 +64,7 @@ Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-0.9.5-optflags.patch
+Patch3: sbcl-1.0-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
 
 Patch6: sbcl-0.9.5-verbose-build.patch
