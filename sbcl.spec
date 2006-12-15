@@ -70,6 +70,7 @@ Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
+Patch8: sbcl-1.0-gcc4_sparc.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -100,6 +101,7 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch8 -p1 -b .gcc4_sparc
 
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
