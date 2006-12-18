@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0 
-Release: 2%{?dist}
+Release: 2%{?dist}.1
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -41,7 +41,7 @@ Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.t
 Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
 %define sbcl_bootstrap_src -a 20 
 %endif
