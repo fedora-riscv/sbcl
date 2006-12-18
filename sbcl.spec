@@ -4,20 +4,25 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+#define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0 
-Release: 1%{?dist}.2
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%if 0%{?fedora} > 2 
 ExclusiveArch: %{ix86} x86_64 ppc sparc
+%else
+# EL-4 ppc bootstrap segfaults (http://bugzilla.redhat.com/220053)
+ExclusiveArch: %{ix86} x86_64
+%endif
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -42,12 +47,12 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -134,8 +139,8 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
 ## my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3/el4 too
-%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-%define my_setarch ./my_setarch
+#{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+#define my_setarch ./my_setarch
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
 # http://bugzilla.redhat.com/169506
@@ -233,6 +238,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Dec 14 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-2
+- initial sparc support (bootstrap, optflags)
+- initial epel-4 support, omitting ppc arch (#220053)
+
 * Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
 - sbcl-1.0
 - don't enable sb:thread (for now), to avoid hang in 'make check' tests 
