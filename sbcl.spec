@@ -4,7 +4,7 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-#define sbcl_verbose 1 
+%define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
