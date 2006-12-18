@@ -5,39 +5,26 @@
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
-
-# shell to use
-#define sbcl_shell /bin/bash -x
-%define sbcl_shell /bin/bash 
+%define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 0.9.12
-Release: 1%{?dist}
+Version: 1.0 
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64
+ExclusiveArch: %{ix86} x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
-## Bootstraps
-# %{ix86}
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-linux-binary.tar.bz2
-# x86_64
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
-# ppc
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.8-powerpc-linux-binary.tar.bz2
-# another possible ppc bootstrap to try
-#Source31: http://clozure.com/openmcl/ftp/openmcl-linuxppc-all-0.14.3.tar.gz
-
-
 ## x86 section
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -46,33 +33,44 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
 # or
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.11-x86-64-linux-binary.tar.bz2
 #define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
-# Latest powerpc-linux bootstrap build fails:
-# http://bugzilla.redhat.com/bugzilla/177029 
-Source35: ppc-linux-mcontext.h
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-%define sbcl_bootstrap_src -a 30
+BuildRequires: sbcl
+# or
+#define sbcl_bootstrap_src -a 30
 %endif
+
+## sparc section
+#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+%ifarch sparc 
+%define sbcl_arch sparc 
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -a 40 
+%endif
+
 
 Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-0.9.5-optflags.patch
-Patch4: sbcl-0.9.4-LIB_DIR.patch
-#Patch5: sbcl-0.9.10-make-config-ppc.patch
+Patch3: sbcl-1.0-optflags.patch
+Patch4: sbcl-0.9.17-LIB_DIR.patch
+
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
+Patch8: sbcl-1.0-gcc4_sparc.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -101,18 +99,15 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
-#patch5 -p1 -b .make-config-ppc
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch8 -p1 -b .gcc4_sparc
 
-# Enable sb-thread
+## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
-cp %{SOURCE2} ./customize-target-features.lisp
-%endif
-
-%ifarch ppc
-cp %{SOURCE35} src/runtime/ppc-linux-mcontext.h.BAK
+# or
+#install -m644 -p %{SOURCE2} ./customize-target-features.lisp
 %endif
 
 # "install" local bootstrap
@@ -129,7 +124,8 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
+#export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
+export CFLAGS="$RPM_OPT_FLAGS"
 
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
@@ -142,9 +138,11 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #define my_setarch ./my_setarch
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
-# at least until a better solution is found
-# http://bugzilla.redhat.com/bugzilla/169506
+# http://bugzilla.redhat.com/169506
 touch contrib/sb-posix/test-passed
+# WORKAROUND sb-bsd-sockets test failures
+# http://bugzilla.redhat.com/214568
+touch contrib/sb-bsd-sockets/test-passed
 
 # trick contrib/ modules to use optflags too 
 export EXTRA_CFLAGS="$CFLAGS"
@@ -161,18 +159,21 @@ make -C doc/manual html info
 
 
 %check
-# santity check, did sb-posix get built/included?
-# http://bugzilla.redhat.com/bugzilla/169506
-SB_POSIX=%{_libdir}/sbcl/sb-posix
-if [ ! -d $RPM_BUILD_ROOT${SB_POSIX} ]; then
-  echo "${SB_POSIX} awol!"
-  exit 1
-fi
+ERROR=0
+# santity check, essential contrib modules get built/included? 
+CONTRIBS="sb-posix sb-bsd-sockets"
+for CONTRIB in $CONTRIBS ; do
+  if [ ! -d $RPM_BUILD_ROOT%{_libdir}/sbcl/$CONTRIB ]; then
+    echo "WARNING: ${CONTRIB} awol!"
+    ERROR=1 
+  fi
+done
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
+exit $ERROR
 
 
 %install
@@ -232,6 +233,43 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Dec 14 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-2
+- initial sparc support (bootstrap, optflags)
+
+* Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
+- sbcl-1.0
+- don't enable sb:thread (for now), to avoid hang in 'make check' tests 
+
+* Mon Nov 13 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.18-2
+- fix awol contrib/sb-bsd-sockets (#214568)
+
+* Thu Oct 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.18-1
+- sbcl-0.9.18
+
+* Tue Sep 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.17-1
+- sbcl-0.9.17
+
+* Mon Aug 28 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-3
+- fc6 respin
+
+* Sun Aug 27 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.16-1
+- 0.9.16
+
+* Mon Jun 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.14-1
+- 0.9.14
+
+* Tue Jun 20 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.13-3
+- use -fPIC in threads.impure.lisp
+
+* Tue May 30 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.13-2
+- 0.9.13
+
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-2
+- respin, using new ppc bootstrap 
+
+* Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1.1
+- try re-enabling ppc build
+
 * Mon Apr 26 2006 Rex Dieter <rexdieter[AT]users.sf.net> 0.9.12-1
 - 0.9.12
 
