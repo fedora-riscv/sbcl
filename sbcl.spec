@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0 
-Release: 1%{?dist}.1
+Release: 1%{?dist}.2
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -42,7 +42,7 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 #BuildRequires: sbcl
@@ -133,9 +133,9 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
-#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-#define my_setarch ./my_setarch
+## my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3/el4 too
+%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+%define my_setarch ./my_setarch
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
 # http://bugzilla.redhat.com/169506
