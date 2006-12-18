@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0 
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -42,7 +42,7 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 #BuildRequires: sbcl
