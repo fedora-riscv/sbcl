@@ -9,22 +9,24 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0 
-Release: 1%{?dist}
+Version: 1.0.1
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 ppc
+ExclusiveArch: %{ix86} x86_64 sparc
+# ppc borked, http://bugzilla.redhat.com/220053
+ExcludeArch: ppc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -33,7 +35,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -42,24 +44,35 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -a 30
+%endif
+
+## sparc section
+#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+%ifarch sparc 
+%define sbcl_arch sparc 
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -a 40 
 %endif
+
 
 Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-0.9.5-optflags.patch
+Patch3: sbcl-1.0-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
 
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
+Patch8: sbcl-1.0-gcc4_sparc.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -90,6 +103,7 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch8 -p1 -b .gcc4_sparc
 
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -221,6 +235,19 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-3
+- native bootstrap
+
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-2
+- ppc builds borked, disable for now (#220053)
+
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-1
+- sbcl-1.0.1
+- use binary bootstraps
+
+* Thu Dec 14 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0-2
+- initial sparc support (bootstrap, optflags)
+
 * Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
 - sbcl-1.0
 - don't enable sb:thread (for now), to avoid hang in 'make check' tests 
