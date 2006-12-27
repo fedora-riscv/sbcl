@@ -10,7 +10,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -26,25 +26,25 @@ ExcludeArch: ppc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 10 
+#define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 20 
+#define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
-Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
+#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 #BuildRequires: sbcl
@@ -56,9 +56,9 @@ Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-b
 #Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
 %ifarch sparc 
 %define sbcl_arch sparc 
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 40 
+#define sbcl_bootstrap_src -a 40 
 %endif
 
 
@@ -235,6 +235,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-3
+- native bootstrap
+
 * Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-2
 - ppc builds borked, disable for now (#220053)
 
