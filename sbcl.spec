@@ -9,59 +9,56 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0 
-Release: 2%{?dist}.1
+Version: 1.0.1
+Release: 3%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-%if 0%{?fedora} > 2 
-ExclusiveArch: %{ix86} x86_64 ppc sparc
-%else
-# EL-4 ppc bootstrap segfaults (http://bugzilla.redhat.com/220053)
-ExclusiveArch: %{ix86} x86_64
-%endif
+ExclusiveArch: %{ix86} x86_64 sparc
+# ppc borked, http://bugzilla.redhat.com/220053
+ExcludeArch: ppc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 10 
+#define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 20 
+#define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
 #Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+%define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
 #Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
 %ifarch sparc 
 %define sbcl_arch sparc 
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 40 
+#define sbcl_bootstrap_src -a 40 
 %endif
 
 
@@ -138,8 +135,8 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-## my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3/el4 too
-#{__cc} -o my_setarch %{optflags} %{SOURCE100} 
+# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
+#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
 #define my_setarch ./my_setarch
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
@@ -238,9 +235,18 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Dec 14 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-2
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-3
+- native bootstrap
+
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-2
+- ppc builds borked, disable for now (#220053)
+
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-1
+- sbcl-1.0.1
+- use binary bootstraps
+
+* Thu Dec 14 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0-2
 - initial sparc support (bootstrap, optflags)
-- initial epel-4 support, omitting ppc arch (#220053)
 
 * Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
 - sbcl-1.0
