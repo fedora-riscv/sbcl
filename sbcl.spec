@@ -9,8 +9,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0 
-Release: 2%{?dist}
+Version: 1.0.1
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -24,30 +24,30 @@ ExclusiveArch: %{ix86} x86_64 ppc sparc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-x86-linux-binary.tar.bz2
+Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 10 
+%define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.18-x86-64-linux-binary.tar.bz2
+Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 20 
+%define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
+Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.12-powerpc-linux-binary.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+%define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -233,7 +233,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Thu Dec 14 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-2
+* Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-1
+- sbcl-1.0.1
+- use binary bootstraps
+
+* Thu Dec 14 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0-2
 - initial sparc support (bootstrap, optflags)
 
 * Mon Dec 04 2006 Rex Dieter <rexdieter[AT]users.sf.net> 1.0-1
