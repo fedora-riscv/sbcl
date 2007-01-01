@@ -10,16 +10,14 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 sparc
-# ppc borked, http://bugzilla.redhat.com/220053
-ExcludeArch: ppc
+ExclusiveArch: %{ix86} x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -44,7 +42,8 @@ BuildRequires: sbcl
 %endif
 
 ## ppc section
-#Source30: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0-powerpc-linux-binary.tar.bz2
+# Thanks David!
+Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 #BuildRequires: sbcl
@@ -73,6 +72,7 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-0.9.9-permissive.patch
 Patch8: sbcl-1.0-gcc4_sparc.patch
+Patch220053: sbcl-1.0.1-bz220053.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -104,6 +104,7 @@ fi
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 %patch8 -p1 -b .gcc4_sparc
+%patch220053 -p0 -b .bz220053
 
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -235,6 +236,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Dec 31 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-4
+- ppc patch, pached ppc bootstrap (David Woodhouse, #220053)
+
 * Wed Dec 27 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-3
 - native bootstrap
 
