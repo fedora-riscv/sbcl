@@ -43,7 +43,7 @@ BuildRequires: sbcl
 
 ## ppc section
 # Thanks David!
-Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 #BuildRequires: sbcl

@@ -4,3 +4,4 @@ sbcl-1.0.1-source.tar.bz2
 sbcl-1.0.1-x86-linux-binary.tar.bz2
 sbcl-1.0.1-x86-64-linux-binary.tar.bz2
 sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
