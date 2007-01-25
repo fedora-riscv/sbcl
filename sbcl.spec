@@ -9,8 +9,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.1
-Release: 4%{?dist}
+Version: 1.0.2
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -43,12 +43,12 @@ BuildRequires: sbcl
 
 ## ppc section
 # Thanks David!
-Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+#Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -70,9 +70,7 @@ Patch4: sbcl-0.9.17-LIB_DIR.patch
 
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
-Patch7: sbcl-0.9.9-permissive.patch
-Patch8: sbcl-1.0-gcc4_sparc.patch
-Patch220053: sbcl-1.0.1-bz220053.patch
+Patch7: sbcl-1.0.2-permissive.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -103,8 +101,6 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
-%patch8 -p1 -b .gcc4_sparc
-%patch220053 -p0 -b .bz220053
 
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
@@ -127,7 +123,6 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-#export CFLAGS="$RPM_OPT_FLAGS -D_GNU_SOURCE -D_LARGEFILE64_SOURCE"
 export CFLAGS="$RPM_OPT_FLAGS"
 
 # setup local bootstrap
@@ -236,6 +231,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Jan 25 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.2-1
+- sbcl-1.0.2
+
+* Fri Jan 05 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-5
+- respin, using native bootstrap
+
 * Sun Dec 31 2006 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.1-4
 - ppc patch, pached ppc bootstrap (David Woodhouse, #220053)
 
