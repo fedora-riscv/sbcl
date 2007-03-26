@@ -9,7 +9,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.2
+Version: 1.0.4
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -59,7 +59,6 @@ BuildRequires: sbcl
 # or
 #define sbcl_bootstrap_src -a 40 
 %endif
-
 
 Source100: my_setarch.c
 
@@ -148,8 +147,6 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
-
-
 # docs
 %if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
@@ -231,6 +228,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Mar 26 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.4-1
+- sbcl-1.0.4
+
+* Wed Feb 28 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.3-1
+- sbcl-1.0.3
+
 * Thu Jan 25 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.2-1
 - sbcl-1.0.2
 
