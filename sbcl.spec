@@ -9,7 +9,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.2
+Version: 1.0.4
 Release: 1%{?dist}
 
 License: BSD/MIT
@@ -24,31 +24,32 @@ ExclusiveArch: %{ix86} x86_64 ppc sparc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
+Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.3-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 10 
+%define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
+Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.3-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 20 
+%define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
 # Thanks David!
 #Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
+Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+%define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -59,7 +60,6 @@ BuildRequires: sbcl
 # or
 #define sbcl_bootstrap_src -a 40 
 %endif
-
 
 Source100: my_setarch.c
 
@@ -148,8 +148,6 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
-
-
 # docs
 %if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
@@ -231,6 +229,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Mar 26 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.4-1
+- sbcl-1.0.4
+
+* Wed Feb 28 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.3-1
+- sbcl-1.0.3
+
 * Thu Jan 25 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.2-1
 - sbcl-1.0.2
 
