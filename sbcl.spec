@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.4
-Release: 2%{?dist}
+Version: 1.0.5
+Release: 1%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
@@ -234,6 +234,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Apr 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.5-1
+- sbcl-1.0.5
+
 * Mon Apr 09 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.4-2
 - re-enable threading support (#235644)
 
