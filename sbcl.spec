@@ -13,14 +13,14 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.6
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 ppc sparc
+ExclusiveArch: i386 x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -234,7 +234,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
-* Mon May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-1
+* Tue May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-2
+- ExclusiveArch: %%ix86 -> i386 (for koji)
+
+* Tue May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-1
 - sbcl-1.0.6
 
 * Sun Apr 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.5-1
