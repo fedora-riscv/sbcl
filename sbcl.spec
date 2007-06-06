@@ -7,24 +7,27 @@
 #define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
+# threading support
+%{?!_without_threads:%define _with_threads --with-threads}
+
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.4
-Release: 1%{?dist}
+Version: 1.0.6
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 ppc sparc
+ExclusiveArch: i386 x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -33,7 +36,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.1-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -44,6 +47,7 @@ BuildRequires: sbcl
 ## ppc section
 # Thanks David!
 #Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
+#Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
 BuildRequires: sbcl
@@ -101,11 +105,13 @@ fi
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
+%if "%{?_with_threads:1}" == "1"
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 # or
-#install -m644 -p %{SOURCE2} ./customize-target-features.lisp
+install -m644 -p %{SOURCE2} ./customize-target-features.lisp
+%endif
 %endif
 
 # "install" local bootstrap
@@ -228,6 +234,18 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jun 06 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-2
+- respin
+
+* Tue May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-1
+- sbcl-1.0.6
+
+* Sun Apr 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.5-1
+- sbcl-1.0.5
+
+* Mon Apr 09 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.4-2
+- re-enable threading support (#235644)
+
 * Mon Mar 26 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.4-1
 - sbcl-1.0.4
 
