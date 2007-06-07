@@ -12,22 +12,22 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.5
-Release: 1%{?dist}
+Version: 1.0.6
+Release: 2%{?dist}
 
 License: BSD/MIT
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: %{ix86} x86_64 ppc sparc
+ExclusiveArch: i386 x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.3-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -36,7 +36,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.3-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -234,6 +234,12 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Jun 06 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-2
+- respin
+
+* Tue May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-1
+- sbcl-1.0.6
+
 * Sun Apr 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.5-1
 - sbcl-1.0.5
 
