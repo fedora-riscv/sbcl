@@ -15,7 +15,7 @@ Summary: Steel Bank Common Lisp
 Version: 1.0.8
 Release: 2%{?dist}
 
-License: BSD/MIT
+License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
@@ -236,6 +236,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Fri Aug 10 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.8-2
 - ExclusiveArch: i386 (#251689)
+- License: BSD
 
 * Sat Jul 28 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.8-1
 - sbcl-1.0.8
