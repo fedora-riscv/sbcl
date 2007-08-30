@@ -12,10 +12,10 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.6
+Version: 1.0.9
 Release: 1%{?dist}
 
-License: BSD/MIT
+License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
@@ -27,32 +27,32 @@ ExclusiveArch: i386 x86_64 ppc sparc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
+#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 10 
+#define sbcl_bootstrap_src -a 10 
 %endif
 
 ## x86_64 section
-Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
+#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 20 
+#define sbcl_bootstrap_src -a 20 
 %endif
 
 ## ppc section
 # Thanks David!
 #Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
-Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+#Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -234,6 +234,25 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Aug 26 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.9-1
+- sbcl-1.0.9
+
+* Sat Aug 25 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.8-3
+- respin (ppc32)
+
+* Fri Aug 10 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.8-2
+- ExclusiveArch: i386 (#251689)
+- License: BSD
+
+* Sat Jul 28 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.8-1
+- sbcl-1.0.8
+
+* Wed Jun 27 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.7-1
+- sbcl-1.0.7
+
+* Wed Jun 06 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-2
+- respin
+
 * Tue May 29 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.6-1
 - sbcl-1.0.6
 
