@@ -12,13 +12,13 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.10
+Version: 1.0.11
 Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
-Source0: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
+Source0: http://osdn.dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: i386 x86_64 ppc sparc
 
@@ -234,6 +234,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Wed Oct 31 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.11-1
+- sbcl-1.0.11
+
 * Mon Oct 08 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.10-1
 - sbcl-1.0.10
 
