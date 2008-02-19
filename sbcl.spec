@@ -13,7 +13,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.14
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -234,6 +234,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.0.14-2
+- Autorebuild for GCC 4.3
+
 * Mon Jan 28 2008 Rex Dieter <rdieter@fedoraproject.org> 1.0.14-1
 - sbcl-1.0.14
 
