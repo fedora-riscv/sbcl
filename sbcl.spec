@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.14
-Release: 2%{?dist}
+Version: 1.0.15
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -128,7 +128,7 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS"
+export CFLAGS="%{optflags}"
 
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
@@ -164,37 +164,40 @@ ERROR=0
 # santity check, essential contrib modules get built/included? 
 CONTRIBS="sb-posix sb-bsd-sockets"
 for CONTRIB in $CONTRIBS ; do
-  if [ ! -d $RPM_BUILD_ROOT%{_libdir}/sbcl/$CONTRIB ]; then
+  if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
   fi
 done
+# omit for now, sbcl-1.0.14+ hangs on room.test.sh
+%if 0
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
+%endif
 exit $ERROR
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
+mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_mandir}}
 
 unset SBCL_HOME 
-export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
-export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
+export INSTALL_ROOT=%{buildroot}%{_prefix} 
+export LIB_DIR=%{buildroot}%{_libdir} 
 %{?sbcl_shell} ./install.sh 
 
 ## Unpackaged files
-rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
-rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
+rm -rf %{buildroot}%{_docdir}/sbcl
+rm -f  %{buildroot}%{_infodir}/dir
 # CVS crud 
-find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
-find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
+find %{buildroot} -name CVS -type d | xargs rm -rf
+find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
-find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -vf
+find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %if "%{?min_bootstrap}" == "%{nil}"
@@ -230,10 +233,14 @@ fi
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 
 %changelog
+* Fri Feb 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-1
+- sbcl-1.0.15
+- %%check: skip run-tests, hangs on room.test.sh
+
 * Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.0.14-2
 - Autorebuild for GCC 4.3
 
