@@ -4,7 +4,7 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-#define sbcl_verbose 1 
+%define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 # threading support
@@ -13,7 +13,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.15
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -74,6 +74,7 @@ Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
+Patch8: sbcl-1.0.15-binutils.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -104,6 +105,7 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch8 -p1 -b .binutils
 
 %if "%{?_with_threads:1}" == "1"
 ## Enable sb-thread
@@ -237,6 +239,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Apr 10 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-2
+- binutils patch
+
 * Fri Feb 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-1
 - sbcl-1.0.15
 - %%check: skip run-tests, hangs on room.test.sh
