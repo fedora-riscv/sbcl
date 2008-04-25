@@ -4,7 +4,7 @@
 #define min_bootstrap 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+#define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 # threading support
@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.15
-Release: 2%{?dist}
+Version: 1.0.16
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -27,7 +27,7 @@ ExclusiveArch: i386 x86_64 ppc sparc
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
+#Source10: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -36,7 +36,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -56,7 +56,7 @@ BuildRequires: sbcl
 %endif
 
 ## sparc section
-#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+#Source40: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
 %ifarch sparc 
 %define sbcl_arch sparc 
 BuildRequires: sbcl
@@ -68,9 +68,9 @@ Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0-optflags.patch
+Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
-
+Patch5: sbcl-1.0.16-GNU_SOURCE.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -103,11 +103,12 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
+%patch5 -p1 -b .GNU_SOURCE
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 %patch8 -p1 -b .binutils
 
-%if "%{?_with_threads:1}" == "1"
+%if 0%{?_with_threads:1}
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
@@ -130,8 +131,6 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="%{optflags}"
-
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
@@ -144,13 +143,11 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
 # http://bugzilla.redhat.com/169506
-touch contrib/sb-posix/test-passed
+#touch contrib/sb-posix/test-passed
 # WORKAROUND sb-bsd-sockets test failures
 # http://bugzilla.redhat.com/214568
-touch contrib/sb-bsd-sockets/test-passed
+#touch contrib/sb-bsd-sockets/test-passed
 
-# trick contrib/ modules to use optflags too 
-export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
@@ -171,14 +168,11 @@ for CONTRIB in $CONTRIBS ; do
     ERROR=1 
   fi
 done
-# omit for now, sbcl-1.0.14+ hangs on room.test.sh
-%if 0
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
 %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
-%endif
 exit $ERROR
 
 
@@ -239,6 +233,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Apr 25 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.16-1
+- sbcl-1.0.16
+
 * Thu Apr 10 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-2
 - binutils patch
 
