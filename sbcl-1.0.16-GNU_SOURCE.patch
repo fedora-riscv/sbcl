@@ -1,0 +1,13 @@
+diff -up sbcl-1.0.16/contrib/asdf-module.mk.GNU_SOURCE sbcl-1.0.16/contrib/asdf-module.mk
+--- sbcl-1.0.16/contrib/asdf-module.mk.GNU_SOURCE	2008-04-25 09:30:41.000000000 -0500
++++ sbcl-1.0.16/contrib/asdf-module.mk	2008-04-25 09:30:34.000000000 -0500
+@@ -9,6 +9,9 @@ CC=gcc
+ 
+ UNAME:=$(shell uname -s)
+ 
++ifeq (Linux,$(UNAME))
++  EXTRA_CFLAGS+=-D_GNU_SOURCE
++endif
+ ifeq (SunOS,$(UNAME))
+   EXTRA_CFLAGS=-D_XOPEN_SOURCE=500 -D__EXTENSIONS__
+ endif
