@@ -13,14 +13,15 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.17
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: i386 x86_64 ppc sparc
+# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
+ExclusiveArch: i386 x86_64 sparc
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -169,7 +170,8 @@ done
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
-%{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+## skip test for now, known to hang
+## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
@@ -231,6 +233,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-2
+- omit ppc build (#448734)
+- skip tests, known to (sometimes) hang
+
 * Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-1
 - sbcl-1.0.17
 
