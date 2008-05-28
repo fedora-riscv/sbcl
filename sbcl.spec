@@ -36,7 +36,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
