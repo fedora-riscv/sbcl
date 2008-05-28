@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.16
+Version: 1.0.17
 Release: 1%{?dist}
 
 License: BSD
@@ -23,7 +23,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: i386 x86_64 ppc sparc
 
 # Pre-generated html docs (not used)
-#Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
+#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
@@ -36,7 +36,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-64-linux-binary.tar.bz2
+Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -74,7 +74,6 @@ Patch5: sbcl-1.0.16-GNU_SOURCE.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
-Patch8: sbcl-1.0.15-binutils.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -106,7 +105,6 @@ fi
 %patch5 -p1 -b .GNU_SOURCE
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
-%patch8 -p1 -b .binutils
 
 %if 0%{?_with_threads:1}
 ## Enable sb-thread
@@ -233,6 +231,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-1
+- sbcl-1.0.17
+
 * Sat Apr 25 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.16-1
 - sbcl-1.0.16
 
