@@ -12,22 +12,27 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.13
-Release: 1%{?dist}
+Version: 1.0.17
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%if 0%{?fedora} > 8
+# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
+ExclusiveArch: i386 x86_64 sparc
+%else
 ExclusiveArch: i386 x86_64 ppc sparc
+%endif
 
 # Pre-generated html docs (not used)
-#Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
+#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
+#Source10: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -36,7 +41,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -56,7 +61,7 @@ BuildRequires: sbcl
 %endif
 
 ## sparc section
-#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+#Source40: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
 %ifarch sparc 
 %define sbcl_arch sparc 
 BuildRequires: sbcl
@@ -68,9 +73,9 @@ Source100: my_setarch.c
 
 Patch1: sbcl-0.8.18-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0-optflags.patch
+Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
-
+Patch5: sbcl-1.0.16-GNU_SOURCE.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -102,10 +107,11 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
+%patch5 -p1 -b .GNU_SOURCE
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
-%if "%{?_with_threads:1}" == "1"
+%if 0%{?_with_threads:1}
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
@@ -128,8 +134,6 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS"
-
 # setup local bootstrap
 %if "%{?sbcl_bootstrap_src}" != "%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
@@ -142,13 +146,11 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
 # http://bugzilla.redhat.com/169506
-touch contrib/sb-posix/test-passed
+#touch contrib/sb-posix/test-passed
 # WORKAROUND sb-bsd-sockets test failures
 # http://bugzilla.redhat.com/214568
-touch contrib/sb-bsd-sockets/test-passed
+#touch contrib/sb-bsd-sockets/test-passed
 
-# trick contrib/ modules to use optflags too 
-export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
@@ -164,7 +166,7 @@ ERROR=0
 # santity check, essential contrib modules get built/included? 
 CONTRIBS="sb-posix sb-bsd-sockets"
 for CONTRIB in $CONTRIBS ; do
-  if [ ! -d $RPM_BUILD_ROOT%{_libdir}/sbcl/$CONTRIB ]; then
+  if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
   fi
@@ -172,29 +174,30 @@ done
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
-%{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+## skip test for now, known to hang
+## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
+mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_mandir}}
 
 unset SBCL_HOME 
-export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
-export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
+export INSTALL_ROOT=%{buildroot}%{_prefix} 
+export LIB_DIR=%{buildroot}%{_libdir} 
 %{?sbcl_shell} ./install.sh 
 
 ## Unpackaged files
-rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
-rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
+rm -rf %{buildroot}%{_docdir}/sbcl
+rm -f  %{buildroot}%{_infodir}/dir
 # CVS crud 
-find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
-find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
+find %{buildroot} -name CVS -type d | xargs rm -rf
+find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
-find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -vf
+find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %if "%{?min_bootstrap}" == "%{nil}"
@@ -202,7 +205,7 @@ find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -vf
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
 
-%postun
+%preun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -230,10 +233,37 @@ fi
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 
 %changelog
+* Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
+- info removal should be done in %%preun (#448933)
+- omit ppc only on f9+ (#448734)
+
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-2
+- omit ppc build (#448734)
+- skip tests, known to (sometimes) hang
+
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-1
+- sbcl-1.0.17
+
+* Sat Apr 25 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.16-1
+- sbcl-1.0.16
+
+* Thu Apr 10 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-2
+- binutils patch
+
+* Fri Feb 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-1
+- sbcl-1.0.15
+- %%check: skip run-tests, hangs on room.test.sh
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.0.14-2
+- Autorebuild for GCC 4.3
+
+* Mon Jan 28 2008 Rex Dieter <rdieter@fedoraproject.org> 1.0.14-1
+- sbcl-1.0.14
+
 * Thu Dec 27 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.13-1
 - sbcl-1.0.13
 
