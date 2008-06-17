@@ -13,15 +13,19 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.17
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+%if 0%{?fedora} > 8
 # reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
 ExclusiveArch: i386 x86_64 sparc
+%else
+ExclusiveArch: i386 x86_64 ppc sparc
+%endif
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -201,7 +205,7 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
 
-%postun
+%preun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -233,6 +237,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
+- info removal should be done in %%preun (#448933)
+- omit ppc only on f9+ (#448734)
+
 * Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-2
 - omit ppc build (#448734)
 - skip tests, known to (sometimes) hang
