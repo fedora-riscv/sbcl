@@ -237,7 +237,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.18-1
+* Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.19-1
 - sbcl-1.0.19
 
 * Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
