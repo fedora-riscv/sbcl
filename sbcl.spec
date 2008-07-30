@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.17
-Release: 3%{?dist}
+Version: 1.0.19
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -71,7 +71,7 @@ BuildRequires: sbcl
 
 Source100: my_setarch.c
 
-Patch1: sbcl-0.8.18-default-sbcl-home.patch
+Patch1: sbcl-1.0.19-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
@@ -103,7 +103,7 @@ fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
-%patch1 -p0 -b .default-sbcl-home
+%patch1 -p1 -b .default-sbcl-home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
@@ -121,7 +121,7 @@ install -m644 -p %{SOURCE2} ./customize-target-features.lisp
 %endif
 
 # "install" local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
 INSTALL_ROOT=`pwd`/../sbcl-bootstrap %{?sbcl_shell} ./install.sh
@@ -135,7 +135,7 @@ find . -name '*.c' | xargs chmod 644
 %build
 
 # setup local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
@@ -156,7 +156,7 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
 # docs
-%if "%{?min_bootstrap}" == "%{nil}"
+%if "x%{?min_bootstrap}" == "x%{nil}"
 make -C doc/manual html info
 %endif
 
@@ -200,7 +200,7 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
-%if "%{?min_bootstrap}" == "%{nil}"
+%if "x%{?min_bootstrap}" == "x%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -225,7 +225,7 @@ fi
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
-%if "%{?min_bootstrap}" == "%{nil}"
+%if "x%{?min_bootstrap}" == "x%{nil}"
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
@@ -237,6 +237,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.18-1
+- sbcl-1.0.19
+
 * Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
 - info removal should be done in %%preun (#448933)
 - omit ppc only on f9+ (#448734)
