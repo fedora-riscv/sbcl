@@ -169,6 +169,8 @@ for CONTRIB in $CONTRIBS ; do
   if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
+    echo "ulimit -a"
+    ulimit -a
   fi
 done
 pushd tests 
