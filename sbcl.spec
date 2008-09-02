@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.19
+Version: 1.0.20
 Release: 1%{?dist}
 
 License: BSD
@@ -75,7 +75,6 @@ Patch1: sbcl-1.0.19-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
-Patch5: sbcl-1.0.16-GNU_SOURCE.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -107,7 +106,6 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
-%patch5 -p1 -b .GNU_SOURCE
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
@@ -239,6 +237,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Sep 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.20-1
+- sbcl-1.0.20
+
 * Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.19-1
 - sbcl-1.0.19
 
