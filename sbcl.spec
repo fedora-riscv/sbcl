@@ -13,7 +13,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.20
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -26,6 +26,9 @@ ExclusiveArch: i386 x86_64 sparc
 %else
 ExclusiveArch: i386 x86_64 ppc sparc
 %endif
+
+BuildRequires: common-lisp-controller
+Requires:      common-lisp-controller
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -70,6 +73,10 @@ BuildRequires: sbcl
 %endif
 
 Source100: my_setarch.c
+
+Source200: sbcl.sh
+Source201: sbcl.rc
+Source202: sbcl-install-clc.lisp
 
 Patch1: sbcl-1.0.19-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
@@ -199,16 +206,22 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
+install -m 744 %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin
+install -m 644 %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
+install -m 644 %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
+cp %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
 
 %if "x%{?min_bootstrap}" == "x%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
+/usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 
 %preun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
+  /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 fi
 %else
 %pre
@@ -229,6 +242,8 @@ fi
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
+%{_libdir}/common-lisp/bin/*
+%{_sysconfdir}/*
 %endif
 
 
@@ -237,6 +252,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Sep 21 2008 Anthony Green <green@redhat.com> - 1.0.20-2
+- Add common-lisp-controller bits.
+
 * Tue Sep 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.20-1
 - sbcl-1.0.20
 
