@@ -13,7 +13,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.20
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -206,8 +206,11 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
+install -dm 755 %{buildroot}%{_libdir}/common-lisp/bin
 install -m 744 %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin
+install -dm 755 %{buildroot}%{_sysconfdir}
 install -m 644 %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
+install -dm 755 %{buildroot}%{_libdir}/sbcl
 install -m 644 %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
 cp %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
 
@@ -252,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Sep 22 2008 Anthony Green <green@redhat.com> - 1.0.20-3
+- Create missing directories.
+
 * Sun Sep 21 2008 Anthony Green <green@redhat.com> - 1.0.20-2
 - Add common-lisp-controller bits.
 
