@@ -22,9 +22,9 @@ Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-sourc
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if 0%{?fedora} > 8
 # reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: i386 x86_64 sparc
+ExclusiveArch: i386 x86_64 sparcv9
 %else
-ExclusiveArch: i386 x86_64 ppc sparc
+ExclusiveArch: i386 x86_64 ppc sparcv9
 %endif
 
 BuildRequires: common-lisp-controller
@@ -65,7 +65,7 @@ BuildRequires: sbcl
 
 ## sparc section
 #Source40: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
-%ifarch sparc 
+%ifarch sparcv9
 %define sbcl_arch sparc 
 BuildRequires: sbcl
 # or
