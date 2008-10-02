@@ -1,7 +1,7 @@
 
-# build only a minimal sbcl whose sole-purpose is to be bootstrap
-# for a future sbcl build
-#define min_bootstrap 1
+%if 0%{?fedora} > 9
+%define common_lisp_controller 1
+%endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.20
-Release: 3%{?dist}
+Version: 1.0.21
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -26,9 +26,6 @@ ExclusiveArch: i386 x86_64 sparcv9
 %else
 ExclusiveArch: i386 x86_64 ppc sparcv9
 %endif
-
-BuildRequires: common-lisp-controller
-Requires:      common-lisp-controller
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
@@ -74,9 +71,15 @@ BuildRequires: sbcl
 
 Source100: my_setarch.c
 
+%if 0%{?common_lisp_controller}
+BuildRequires: common-lisp-controller
+Requires:      common-lisp-controller
+Requires(post): common-lisp-controller
+Requires(preun): common-lisp-controller
 Source200: sbcl.sh
 Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
+%endif
 
 Patch1: sbcl-1.0.19-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
@@ -161,9 +164,7 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
 # docs
-%if "x%{?min_bootstrap}" == "x%{nil}"
 make -C doc/manual html info
-%endif
 
 
 %check
@@ -197,6 +198,14 @@ export INSTALL_ROOT=%{buildroot}%{_prefix}
 export LIB_DIR=%{buildroot}%{_libdir} 
 %{?sbcl_shell} ./install.sh 
 
+%if 0%{?common_lisp_controller}
+install -m744 -p -D %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin/sbcl.sh
+install -m644 -p -D %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
+install -m644 -p -D %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
+# linking ok? -- Rex
+cp -p %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
+%endif
+
 ## Unpackaged files
 rm -rf %{buildroot}%{_docdir}/sbcl
 rm -f  %{buildroot}%{_infodir}/dir
@@ -206,15 +215,7 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
-install -dm 755 %{buildroot}%{_libdir}/common-lisp/bin
-install -m 744 %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin
-install -dm 755 %{buildroot}%{_sysconfdir}
-install -m 644 %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
-install -dm 755 %{buildroot}%{_libdir}/sbcl
-install -m 644 %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
-cp %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
 
-%if "x%{?min_bootstrap}" == "x%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -226,12 +227,6 @@ if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
   /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 fi
-%else
-%pre
-# min_bootstrap: We *could* check for only-on-upgrade, but why bother?   (-:
-/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
-/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
-%endif
 
 
 %files
@@ -241,10 +236,10 @@ fi
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
-%if "x%{?min_bootstrap}" == "x%{nil}"
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
+%if 0%{?common_lisp_controller}
 %{_libdir}/common-lisp/bin/*
 %{_sysconfdir}/*
 %endif
@@ -255,6 +250,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.21-1
+- sbcl-1.0.21
+- common-lisp-controller bits f10+ only (for now)
+- drop never-used min_bootstrap crud
+
 * Mon Sep 22 2008 Anthony Green <green@redhat.com> - 1.0.20-3
 - Create missing directories.
 
