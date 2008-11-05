@@ -1,7 +1,7 @@
 
-# build only a minimal sbcl whose sole-purpose is to be bootstrap
-# for a future sbcl build
-#define min_bootstrap 1
+%if 0%{?fedora} > 9
+%define common_lisp_controller 1
+%endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -12,8 +12,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.17
-Release: 3%{?dist}
+Version: 1.0.22
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -22,9 +22,9 @@ Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-sourc
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if 0%{?fedora} > 8
 # reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: i386 x86_64 sparc
+ExclusiveArch: i386 x86_64 sparcv9
 %else
-ExclusiveArch: i386 x86_64 ppc sparc
+ExclusiveArch: i386 x86_64 ppc sparcv9
 %endif
 
 # Pre-generated html docs (not used)
@@ -62,7 +62,7 @@ BuildRequires: sbcl
 
 ## sparc section
 #Source40: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
-%ifarch sparc 
+%ifarch sparcv9
 %define sbcl_arch sparc 
 BuildRequires: sbcl
 # or
@@ -71,11 +71,20 @@ BuildRequires: sbcl
 
 Source100: my_setarch.c
 
-Patch1: sbcl-0.8.18-default-sbcl-home.patch
+%if 0%{?common_lisp_controller}
+BuildRequires: common-lisp-controller
+Requires:      common-lisp-controller
+Requires(post): common-lisp-controller
+Requires(preun): common-lisp-controller
+Source200: sbcl.sh
+Source201: sbcl.rc
+Source202: sbcl-install-clc.lisp
+%endif
+
+Patch1: sbcl-1.0.19-default-sbcl-home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
-Patch5: sbcl-1.0.16-GNU_SOURCE.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -103,11 +112,10 @@ fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
-%patch1 -p0 -b .default-sbcl-home
+%patch1 -p1 -b .default-sbcl-home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
-%patch5 -p1 -b .GNU_SOURCE
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
@@ -121,7 +129,7 @@ install -m644 -p %{SOURCE2} ./customize-target-features.lisp
 %endif
 
 # "install" local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
 INSTALL_ROOT=`pwd`/../sbcl-bootstrap %{?sbcl_shell} ./install.sh
@@ -135,7 +143,7 @@ find . -name '*.c' | xargs chmod 644
 %build
 
 # setup local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
@@ -156,9 +164,7 @@ export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
 # docs
-%if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
-%endif
 
 
 %check
@@ -169,6 +175,8 @@ for CONTRIB in $CONTRIBS ; do
   if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
+    echo "ulimit -a"
+    ulimit -a
   fi
 done
 pushd tests 
@@ -190,6 +198,14 @@ export INSTALL_ROOT=%{buildroot}%{_prefix}
 export LIB_DIR=%{buildroot}%{_libdir} 
 %{?sbcl_shell} ./install.sh 
 
+%if 0%{?common_lisp_controller}
+install -m744 -p -D %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin/sbcl.sh
+install -m644 -p -D %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
+install -m644 -p -D %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
+# linking ok? -- Rex
+cp -p %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
+%endif
+
 ## Unpackaged files
 rm -rf %{buildroot}%{_docdir}/sbcl
 rm -f  %{buildroot}%{_infodir}/dir
@@ -200,22 +216,17 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
-%if "%{?min_bootstrap}" == "%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
+/usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 
 %preun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
+  /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 fi
-%else
-%pre
-# min_bootstrap: We *could* check for only-on-upgrade, but why bother?   (-:
-/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
-/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
-%endif
 
 
 %files
@@ -225,10 +236,12 @@ fi
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
-%if "%{?min_bootstrap}" == "%{nil}"
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
+%if 0%{?common_lisp_controller}
+%{_libdir}/common-lisp/bin/*
+%{_sysconfdir}/*
 %endif
 
 
@@ -237,6 +250,26 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.22-1
+- sbcl-1.0.22
+
+* Thu Oct 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.21-1
+- sbcl-1.0.21
+- common-lisp-controller bits f10+ only (for now)
+- drop never-used min_bootstrap crud
+
+* Mon Sep 22 2008 Anthony Green <green@redhat.com> - 1.0.20-3
+- Create missing directories.
+
+* Sun Sep 21 2008 Anthony Green <green@redhat.com> - 1.0.20-2
+- Add common-lisp-controller bits.
+
+* Tue Sep 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.20-1
+- sbcl-1.0.20
+
+* Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.19-1
+- sbcl-1.0.19
+
 * Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
 - info removal should be done in %%preun (#448933)
 - omit ppc only on f9+ (#448734)
