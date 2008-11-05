@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.21
+Version: 1.0.22
 Release: 1%{?dist}
 
 License: BSD
@@ -250,6 +250,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.22-1
+- sbcl-1.0.22
+
 * Thu Oct 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.21-1
 - sbcl-1.0.21
 - common-lisp-controller bits f10+ only (for now)
