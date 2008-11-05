@@ -1,7 +1,7 @@
 
-# build only a minimal sbcl whose sole-purpose is to be bootstrap
-# for a future sbcl build
-#define min_bootstrap 1
+%if 0%{?fedora} > 9
+%define common_lisp_controller 1
+%endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.13
+Version: 1.0.22
 Release: 1%{?dist}
 
 License: BSD
@@ -20,14 +20,19 @@ Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-ExclusiveArch: i386 x86_64 ppc sparc
+%if 0%{?fedora} > 8
+# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
+ExclusiveArch: i386 x86_64 sparcv9
+%else
+ExclusiveArch: i386 x86_64 ppc sparcv9
+%endif
 
 # Pre-generated html docs (not used)
-#Source1: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
+#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
-#Source10: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-linux-binary.tar.bz2
+#Source10: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-linux-binary.tar.bz2
 %ifarch %{ix86}
 %define sbcl_arch x86
 BuildRequires: sbcl
@@ -36,7 +41,7 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-#Source20: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-1.0.5-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
@@ -56,8 +61,8 @@ BuildRequires: sbcl
 %endif
 
 ## sparc section
-#Source40: http://dl.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
-%ifarch sparc 
+#Source40: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-0.9.17-sparc-linux-binary.tar.bz2
+%ifarch sparcv9
 %define sbcl_arch sparc 
 BuildRequires: sbcl
 # or
@@ -66,11 +71,20 @@ BuildRequires: sbcl
 
 Source100: my_setarch.c
 
-Patch1: sbcl-0.8.18-default-sbcl-home.patch
-Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0-optflags.patch
-Patch4: sbcl-0.9.17-LIB_DIR.patch
+%if 0%{?common_lisp_controller}
+BuildRequires: common-lisp-controller
+Requires:      common-lisp-controller
+Requires(post): common-lisp-controller
+Requires(preun): common-lisp-controller
+Source200: sbcl.sh
+Source201: sbcl.rc
+Source202: sbcl-install-clc.lisp
+%endif
 
+Patch1: sbcl-1.0.19-default-sbcl-home.patch
+Patch2: sbcl-0.9.5-personality.patch
+Patch3: sbcl-1.0.16-optflags.patch
+Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -98,14 +112,14 @@ fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
-%patch1 -p0 -b .default-sbcl-home
+%patch1 -p1 -b .default-sbcl-home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
-%if "%{?_with_threads:1}" == "1"
+%if 0%{?_with_threads:1}
 ## Enable sb-thread
 %ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
@@ -115,7 +129,7 @@ install -m644 -p %{SOURCE2} ./customize-target-features.lisp
 %endif
 
 # "install" local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 mkdir sbcl-bootstrap
 pushd sbcl-*-linux
 INSTALL_ROOT=`pwd`/../sbcl-bootstrap %{?sbcl_shell} ./install.sh
@@ -128,10 +142,8 @@ find . -name '*.c' | xargs chmod 644
 
 %build
 
-export CFLAGS="$RPM_OPT_FLAGS"
-
 # setup local bootstrap
-%if "%{?sbcl_bootstrap_src}" != "%{nil}"
+%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
@@ -142,21 +154,17 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 
 # WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
 # http://bugzilla.redhat.com/169506
-touch contrib/sb-posix/test-passed
+#touch contrib/sb-posix/test-passed
 # WORKAROUND sb-bsd-sockets test failures
 # http://bugzilla.redhat.com/214568
-touch contrib/sb-bsd-sockets/test-passed
+#touch contrib/sb-bsd-sockets/test-passed
 
-# trick contrib/ modules to use optflags too 
-export EXTRA_CFLAGS="$CFLAGS"
 export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
 # docs
-%if "%{?min_bootstrap}" == "%{nil}"
 make -C doc/manual html info
-%endif
 
 
 %check
@@ -164,55 +172,61 @@ ERROR=0
 # santity check, essential contrib modules get built/included? 
 CONTRIBS="sb-posix sb-bsd-sockets"
 for CONTRIB in $CONTRIBS ; do
-  if [ ! -d $RPM_BUILD_ROOT%{_libdir}/sbcl/$CONTRIB ]; then
+  if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
+    echo "ulimit -a"
+    ulimit -a
   fi
 done
 pushd tests 
 # Only x86 builds are expected to pass all
 # Don't worry about thread.impure failure(s), threading is optional anyway.
-%{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+## skip test for now, known to hang
+## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-mkdir -p $RPM_BUILD_ROOT{%{_bindir},%{_libdir},%{_mandir}}
+mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_mandir}}
 
 unset SBCL_HOME 
-export INSTALL_ROOT=$RPM_BUILD_ROOT%{_prefix} 
-export LIB_DIR=$RPM_BUILD_ROOT%{_libdir} 
+export INSTALL_ROOT=%{buildroot}%{_prefix} 
+export LIB_DIR=%{buildroot}%{_libdir} 
 %{?sbcl_shell} ./install.sh 
 
+%if 0%{?common_lisp_controller}
+install -m744 -p -D %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin/sbcl.sh
+install -m644 -p -D %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
+install -m644 -p -D %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
+# linking ok? -- Rex
+cp -p %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
+%endif
+
 ## Unpackaged files
-rm -rf $RPM_BUILD_ROOT%{_docdir}/sbcl
-rm -f  $RPM_BUILD_ROOT%{_infodir}/dir
+rm -rf %{buildroot}%{_docdir}/sbcl
+rm -f  %{buildroot}%{_infodir}/dir
 # CVS crud 
-find $RPM_BUILD_ROOT -name CVS -type d | xargs rm -rf
-find $RPM_BUILD_ROOT -name .cvsignore | xargs rm -f
+find %{buildroot} -name CVS -type d | xargs rm -rf
+find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
-find $RPM_BUILD_ROOT -name 'test-passed' | xargs rm -vf
+find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
-%if "%{?min_bootstrap}" == "%{nil}"
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
+/usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 
-%postun
+%preun
 if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
+  /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 fi
-%else
-%pre
-# min_bootstrap: We *could* check for only-on-upgrade, but why bother?   (-:
-/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir >& /dev/null ||:
-/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir >& /dev/null ||:
-%endif
 
 
 %files
@@ -222,18 +236,67 @@ fi
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
-%if "%{?min_bootstrap}" == "%{nil}"
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
+%if 0%{?common_lisp_controller}
+%{_libdir}/common-lisp/bin/*
+%{_sysconfdir}/*
 %endif
 
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 
 %changelog
+* Thu Oct 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.22-1
+- sbcl-1.0.22
+
+* Thu Oct 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.21-1
+- sbcl-1.0.21
+- common-lisp-controller bits f10+ only (for now)
+- drop never-used min_bootstrap crud
+
+* Mon Sep 22 2008 Anthony Green <green@redhat.com> - 1.0.20-3
+- Create missing directories.
+
+* Sun Sep 21 2008 Anthony Green <green@redhat.com> - 1.0.20-2
+- Add common-lisp-controller bits.
+
+* Tue Sep 02 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.20-1
+- sbcl-1.0.20
+
+* Wed Jul 30 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.19-1
+- sbcl-1.0.19
+
+* Thu May 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-3
+- info removal should be done in %%preun (#448933)
+- omit ppc only on f9+ (#448734)
+
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-2
+- omit ppc build (#448734)
+- skip tests, known to (sometimes) hang
+
+* Wed May 28 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.17-1
+- sbcl-1.0.17
+
+* Sat Apr 25 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.16-1
+- sbcl-1.0.16
+
+* Thu Apr 10 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-2
+- binutils patch
+
+* Fri Feb 29 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.15-1
+- sbcl-1.0.15
+- %%check: skip run-tests, hangs on room.test.sh
+
+* Tue Feb 19 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 1.0.14-2
+- Autorebuild for GCC 4.3
+
+* Mon Jan 28 2008 Rex Dieter <rdieter@fedoraproject.org> 1.0.14-1
+- sbcl-1.0.14
+
 * Thu Dec 27 2007 Rex Dieter <rdieter[AT]fedoraproject.org> 1.0.13-1
 - sbcl-1.0.13
 
