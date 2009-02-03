@@ -12,7 +12,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.24
+Version: 1.0.25
 Release: 1%{?dist}
 
 License: BSD
@@ -81,7 +81,7 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch1: sbcl-1.0.19-default-sbcl-home.patch
+Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-1.0.16-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
@@ -112,7 +112,7 @@ fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
-%patch1 -p1 -b .default-sbcl-home
+%patch1 -p1 -b .default_sbcl_home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %patch4 -p1 -b .LIB_DIR
@@ -250,6 +250,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Feb 03 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.25-1
+- sbcl-1.0.25
+
 * Wed Dec 31 2008 Rex Dieter <rdieter@fedoraproject.org> - 1.0.24-1
 - sbcl-1.0.24
 
