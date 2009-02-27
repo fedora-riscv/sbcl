@@ -13,7 +13,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.25
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -22,9 +22,9 @@ Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-sourc
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 %if 0%{?fedora} > 8
 # reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: i386 x86_64 sparcv9
+ExclusiveArch: %{ix86} x86_64 sparcv9
 %else
-ExclusiveArch: i386 x86_64 ppc sparcv9
+ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 %endif
 
 # Pre-generated html docs (not used)
@@ -250,6 +250,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Feb 27 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.25-3
+- ExclusiveArch: s/i386/%%ix86/
+
 * Wed Feb 25 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.25-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
