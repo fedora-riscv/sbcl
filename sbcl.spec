@@ -8,11 +8,11 @@
 %define sbcl_shell /bin/bash
 
 # threading support
-%{?!_without_threads:%define _with_threads --with-threads}
+%{?!_without_threads:%global _with_threads --with-threads}
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.26
+Version: 1.0.28
 Release: 1%{?dist}
 
 License: BSD
@@ -83,11 +83,15 @@ Source202: sbcl-install-clc.lisp
 
 Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.16-optflags.patch
+Patch3: sbcl-1.0.28-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
+
+## upstream patches
+# use ADDR_NO_RANDOMIZE on x86_64 too
+Patch100: sbcl-1.0.28-x86_64_ADDR_NO_RANDOMIZE-2.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -118,6 +122,9 @@ fi
 %patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+
+%patch100 -p0 -b .x86_64_ADDR_NO_RANDOMIZE-2
+
 
 %if 0%{?_with_threads:1}
 ## Enable sb-thread
@@ -250,6 +257,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Apr 30 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.28-1
+- sbcl-1.0.28
+
 * Wed Mar 04 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.26-1
 - sbcl-1.0.26
 
