@@ -234,7 +234,7 @@ fi
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
-%doc SUPPORT STYLE PRINCIPLES
+%doc STYLE PRINCIPLES
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
