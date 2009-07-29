@@ -8,11 +8,11 @@
 %define sbcl_shell /bin/bash
 
 # threading support
-%{?!_without_threads:%define _with_threads --with-threads}
+%{?!_without_threads:%global _with_threads --with-threads}
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.26
+Version: 1.0.30
 Release: 1%{?dist}
 
 License: BSD
@@ -83,11 +83,13 @@ Source202: sbcl-install-clc.lisp
 
 Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.16-optflags.patch
+Patch3: sbcl-1.0.28-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
+
+## upstream patches
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -232,7 +234,7 @@ fi
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
-%doc SUPPORT STYLE PRINCIPLES
+%doc STYLE PRINCIPLES
 %{_bindir}/*
 %{_libdir}/sbcl/
 %{_mandir}/man?/*
@@ -250,6 +252,18 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Jul 28 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.30-1
+- sbcl-1.0.30
+
+* Sun Jul 26 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.29-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
+* Sun Jun 28 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.29-1
+- sbcl-1.0.29
+
+* Thu Apr 30 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.28-1
+- sbcl-1.0.28
+
 * Wed Mar 04 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.26-1
 - sbcl-1.0.26
 
