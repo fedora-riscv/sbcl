@@ -1,20 +1,6 @@
-diff -up sbcl-1.0.19/src/runtime/runtime.c.default-sbcl-home sbcl-1.0.19/src/runtime/runtime.c
---- sbcl-1.0.19/src/runtime/runtime.c.default-sbcl-home	2008-05-15 10:37:50.000000000 -0500
-+++ sbcl-1.0.19/src/runtime/runtime.c	2008-07-30 09:20:33.000000000 -0500
-@@ -66,9 +66,7 @@
- #include "interr.h"
- #endif
- 
--#ifndef SBCL_HOME
--#define SBCL_HOME "/usr/local/lib/sbcl/"
--#endif
-+#include "sbcl-home.h"
- 
- 
- /* SIGINT handler that invokes the monitor (for when Lisp isn't up to it) */
-diff -up sbcl-1.0.19/make-target-1.sh.default-sbcl-home sbcl-1.0.19/make-target-1.sh
---- sbcl-1.0.19/make-target-1.sh.default-sbcl-home	2006-01-09 07:00:18.000000000 -0600
-+++ sbcl-1.0.19/make-target-1.sh	2008-07-30 09:20:33.000000000 -0500
+diff -up sbcl-1.0.25/make-target-1.sh.default-sbcl-home sbcl-1.0.25/make-target-1.sh
+--- sbcl-1.0.25/make-target-1.sh.default-sbcl-home	2006-04-27 11:32:42.000000000 -0500
++++ sbcl-1.0.25/make-target-1.sh	2009-02-03 08:18:10.000000000 -0600
 @@ -20,6 +20,29 @@ LANG=C
  LC_ALL=C
  export LANG LC_ALL
@@ -45,3 +31,17 @@ diff -up sbcl-1.0.19/make-target-1.sh.default-sbcl-home sbcl-1.0.19/make-target-
  # Build the runtime system and symbol table (.nm) file.
  #
  # (This C build has to come after the first genesis in order to get
+diff -up sbcl-1.0.25/src/runtime/runtime.c.default-sbcl-home sbcl-1.0.25/src/runtime/runtime.c
+--- sbcl-1.0.25/src/runtime/runtime.c.default-sbcl-home	2009-01-25 18:56:09.000000000 -0600
++++ sbcl-1.0.25/src/runtime/runtime.c	2009-02-03 08:19:24.000000000 -0600
+@@ -66,9 +66,7 @@
+ #include "interr.h"
+ #endif
+ 
+-#ifndef SBCL_HOME
+-#define SBCL_HOME "/usr/local/lib/sbcl/"
+-#endif
++#include "sbcl-home.h"
+ 
+ #ifdef LISP_FEATURE_HPUX
+ extern void *return_from_lisp_stub;

@@ -1,0 +1,59 @@
+diff -up sbcl-1.0.28/contrib/asdf-module.mk.optflags sbcl-1.0.28/contrib/asdf-module.mk
+--- sbcl-1.0.28/contrib/asdf-module.mk.optflags	2009-04-28 11:02:13.000000000 -0500
++++ sbcl-1.0.28/contrib/asdf-module.mk	2009-04-30 12:22:56.509637395 -0500
+@@ -20,6 +20,8 @@ ifeq (CYGWIN,$(findstring CYGWIN,$(UNAME
+   CC:=$(shell cygpath -m $(shell readlink -fn $(shell which $(CC))))
+ endif
+ 
++EXTRA_CFLAGS += $(RPM_OPT_FLAGS)
++
+ export CC SBCL EXTRA_CFLAGS EXTRA_LDFLAGS
+ 
+ all: $(EXTRA_ALL_TARGETS)
+diff -up sbcl-1.0.28/src/runtime/Config.ppc-linux.optflags sbcl-1.0.28/src/runtime/Config.ppc-linux
+--- sbcl-1.0.28/src/runtime/Config.ppc-linux.optflags	2006-11-19 05:26:16.000000000 -0600
++++ sbcl-1.0.28/src/runtime/Config.ppc-linux	2009-04-30 12:21:36.861636752 -0500
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g
++CFLAGS += $(RPM_OPT_FLAGS)
+ LINKFLAGS += -v -rdynamic
+ NM = ./linux-nm
+ 
+diff -up sbcl-1.0.28/src/runtime/Config.sparc-linux.optflags sbcl-1.0.28/src/runtime/Config.sparc-linux
+--- sbcl-1.0.28/src/runtime/Config.sparc-linux.optflags	2005-09-16 08:26:39.000000000 -0500
++++ sbcl-1.0.28/src/runtime/Config.sparc-linux	2009-04-30 12:21:36.862636949 -0500
+@@ -10,6 +10,7 @@
+ # files for more information.
+ 
+ ASFLAGS = -g -Wall
++CFLAGS += $(RPM_OPT_FLAGS)
+ LINKFLAGS += -v -rdynamic
+ NM = ./linux-nm
+ 
+diff -up sbcl-1.0.28/src/runtime/Config.x86_64-linux.optflags sbcl-1.0.28/src/runtime/Config.x86_64-linux
+--- sbcl-1.0.28/src/runtime/Config.x86_64-linux.optflags	2006-11-13 10:03:31.000000000 -0600
++++ sbcl-1.0.28/src/runtime/Config.x86_64-linux	2009-04-30 12:21:36.863636867 -0500
+@@ -34,7 +34,7 @@ ifdef LISP_FEATURE_SB_THREAD
+   OS_LIBS += -lpthread
+ endif
+ 
+-CFLAGS += -fno-omit-frame-pointer
++CFLAGS += -fno-omit-frame-pointer $(RPM_OPT_FLAGS)
+ 
+ GC_SRC = gencgc.c
+ 
+diff -up sbcl-1.0.28/src/runtime/Config.x86-linux.optflags sbcl-1.0.28/src/runtime/Config.x86-linux
+--- sbcl-1.0.28/src/runtime/Config.x86-linux.optflags	2006-11-13 10:03:31.000000000 -0600
++++ sbcl-1.0.28/src/runtime/Config.x86-linux	2009-04-30 12:21:36.864637274 -0500
+@@ -38,6 +38,8 @@ ifdef LISP_FEATURE_SB_THREAD
+   OS_LIBS += -lpthread
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.
