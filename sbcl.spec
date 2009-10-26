@@ -15,8 +15,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.30
-Release: 2%{?dist}
+Version: 1.0.32
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -263,6 +263,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Oct 26 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-1
+- sbcl-1.0.32
+
 * Tue Aug 18 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.30-2
 - customize version.lisp-expr for rpm %%release
 - s|%%_libdir|%%_prefix/lib|, so common-lisp-controller has at least
