@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.32
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -192,10 +192,7 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-# Only x86 builds are expected to pass all
-# Don't worry about thread.impure failure(s), threading is optional anyway.
-## skip test for now, known to hang
-## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh
 popd
 exit $ERROR
 
@@ -263,6 +260,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Dec 21 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-2
+- %%check: (re)enable run-tests.sh
+
 * Mon Oct 26 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-1
 - sbcl-1.0.32
 
