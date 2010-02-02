@@ -15,8 +15,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.32
-Release: 2%{?dist}
+Version: 1.0.35
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -226,7 +226,6 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
-## FIXME! register-common-lisp-implementation fails (at least on x86_64)
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -261,6 +260,12 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
+- sbcl-1.0.35
+
+* Tue Dec 22 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.33-1
+- sbcl-1.0.33
+
 * Mon Dec 21 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-2
 - %%check: (re)enable run-tests.sh
 
