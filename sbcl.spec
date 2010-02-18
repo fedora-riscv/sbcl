@@ -8,11 +8,14 @@
 %define sbcl_shell /bin/bash
 
 # threading support
+## Enable sb-thread
+%ifarch %{ix86} x86_64
 %{?!_without_threads:%global _with_threads --with-threads}
+%endif
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.30
+Version: 1.0.35
 Release: 1%{?dist}
 
 License: BSD
@@ -28,7 +31,7 @@ ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 %endif
 
 # Pre-generated html docs (not used)
-#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-html.tar.bz2
+#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
@@ -83,7 +86,7 @@ Source202: sbcl-install-clc.lisp
 
 Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.28-optflags.patch
+Patch3: sbcl-1.0.30-optflags.patch
 Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
@@ -105,14 +108,14 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src} 
+%setup -q %{?sbcl_bootstrap_src}
 
 # Handle pre-generated docs
 if [ -d %{name}-%{version}/doc/manual ]; then
   mv %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
-#sed -i -e "s|/usr/local/lib/sbcl/|%{_libdir}/sbcl/|" src/runtime/runtime.c
+#sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
 #or patch to use SBCL_HOME env var
 %patch1 -p1 -b .default_sbcl_home
 %patch2 -p1 -b .personality
@@ -123,11 +126,9 @@ fi
 
 %if 0%{?_with_threads:1}
 ## Enable sb-thread
-%ifarch %{ix86} x86_64
 #sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
 # or
 install -m644 -p %{SOURCE2} ./customize-target-features.lisp
-%endif
 %endif
 
 # "install" local bootstrap
@@ -140,6 +141,9 @@ popd
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
+
+# set version.lisp-expr
+sed -i.rpmver -e "s|\"%{version}\"|\"%{version}-%{release}\"|" version.lisp-expr
 
 
 %build
@@ -161,7 +165,13 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 # http://bugzilla.redhat.com/214568
 #touch contrib/sb-bsd-sockets/test-passed
 
-export DEFAULT_SBCL_HOME=%{_libdir}/sbcl
+# WORKAROUND ppc linker issue
+%ifarch ppc
+#export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mlongcall"; 
+#echo "RPM_OPT_FLAGS: $RPM_OPT_FLAGS"
+%endif
+
+export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
 
@@ -174,7 +184,7 @@ ERROR=0
 # santity check, essential contrib modules get built/included? 
 CONTRIBS="sb-posix sb-bsd-sockets"
 for CONTRIB in $CONTRIBS ; do
-  if [ ! -d %{buildroot}%{_libdir}/sbcl/$CONTRIB ]; then
+  if [ ! -d %{buildroot}%{_prefix}/lib/sbcl/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1 
     echo "ulimit -a"
@@ -182,10 +192,8 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-# Only x86 builds are expected to pass all
-# Don't worry about thread.impure failure(s), threading is optional anyway.
-## skip test for now, known to hang
-## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+# still seeing periodic thread.impure failure(s) in koji
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
@@ -193,19 +201,19 @@ exit $ERROR
 %install
 rm -rf %{buildroot}
 
-mkdir -p %{buildroot}{%{_bindir},%{_libdir},%{_mandir}}
+mkdir -p %{buildroot}{%{_bindir},%{_prefix}/lib,%{_mandir}}
 
 unset SBCL_HOME 
 export INSTALL_ROOT=%{buildroot}%{_prefix} 
-export LIB_DIR=%{buildroot}%{_libdir} 
+export LIB_DIR=%{buildroot}%{_prefix}/lib
 %{?sbcl_shell} ./install.sh 
 
 %if 0%{?common_lisp_controller}
-install -m744 -p -D %{SOURCE200} %{buildroot}%{_libdir}/common-lisp/bin/sbcl.sh
+install -m744 -p -D %{SOURCE200} %{buildroot}%{_prefix}/lib/common-lisp/bin/sbcl.sh
 install -m644 -p -D %{SOURCE201} %{buildroot}%{_sysconfdir}/sbcl.rc
-install -m644 -p -D %{SOURCE202} %{buildroot}%{_libdir}/sbcl/install-clc.lisp
+install -m644 -p -D %{SOURCE202} %{buildroot}%{_prefix}/lib/sbcl/install-clc.lisp
 # linking ok? -- Rex
-cp -p %{buildroot}%{_libdir}/sbcl/sbcl.core %{buildroot}%{_libdir}/sbcl/sbcl-dist.core
+cp -p %{buildroot}%{_prefix}/lib/sbcl/sbcl.core %{buildroot}%{_prefix}/lib/sbcl/sbcl-dist.core
 %endif
 
 ## Unpackaged files
@@ -236,13 +244,13 @@ fi
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc STYLE PRINCIPLES
 %{_bindir}/*
-%{_libdir}/sbcl/
+%{_prefix}/lib/sbcl/
 %{_mandir}/man?/*
 %doc doc/manual/sbcl
 %doc doc/manual/asdf
 %{_infodir}/*
 %if 0%{?common_lisp_controller}
-%{_libdir}/common-lisp/bin/*
+%{_prefix}/lib/common-lisp/bin/*
 %{_sysconfdir}/*
 %endif
 
@@ -252,6 +260,23 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
+- sbcl-1.0.35
+
+* Tue Dec 22 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.33-1
+- sbcl-1.0.33
+
+* Mon Dec 21 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-2
+- %%check: (re)enable run-tests.sh
+
+* Mon Oct 26 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-1
+- sbcl-1.0.32
+
+* Tue Aug 18 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.30-2
+- customize version.lisp-expr for rpm %%release
+- s|%%_libdir|%%_prefix/lib|, so common-lisp-controller has at least
+  a chance to work
+
 * Tue Jul 28 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.30-1
 - sbcl-1.0.30
 
