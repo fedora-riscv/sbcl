@@ -1,5 +1,5 @@
 # Makefile for source rpm: sbcl
-# $Id: Makefile,v 1.1 2005/09/12 12:35:18 rdieter Exp $
+# $Id: Makefile,v 1.2 2009/11/25 23:15:20 notting Exp $
 NAME := sbcl
 SPECFILE = $(firstword $(wildcard *.spec))
 
