@@ -15,8 +15,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.30
-Release: 2%{?dist}
+Version: 1.0.35
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -192,10 +192,8 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-# Only x86 builds are expected to pass all
-# Don't worry about thread.impure failure(s), threading is optional anyway.
-## skip test for now, known to hang
-## %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+# still seeing periodic thread.impure failure(s) in koji
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
@@ -228,7 +226,6 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
-## FIXME! register-common-lisp-implementation fails (at least on x86_64)
 %post
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
@@ -263,6 +260,18 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
+- sbcl-1.0.35
+
+* Tue Dec 22 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.33-1
+- sbcl-1.0.33
+
+* Mon Dec 21 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-2
+- %%check: (re)enable run-tests.sh
+
+* Mon Oct 26 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.32-1
+- sbcl-1.0.32
+
 * Tue Aug 18 2009 Rex Dieter <rdieter@fedoraproject.org> - 1.0.30-2
 - customize version.lisp-expr for rpm %%release
 - s|%%_libdir|%%_prefix/lib|, so common-lisp-controller has at least
