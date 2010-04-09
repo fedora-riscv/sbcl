@@ -15,7 +15,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.35
+Version: 1.0.37
 Release: 1%{?dist}
 
 License: BSD
@@ -23,12 +23,8 @@ Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-%if 0%{?fedora} > 8
-# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: %{ix86} x86_64 sparcv9
-%else
+
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
-%endif
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -260,6 +256,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Apr 07 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.37-1
+- sbcl-1.0.37
+
 * Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
 - sbcl-1.0.35
 
