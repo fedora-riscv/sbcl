@@ -16,19 +16,14 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.35
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-%if 0%{?fedora} > 8
-# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: %{ix86} x86_64 sparcv9
-%else
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
-%endif
 
 # Pre-generated html docs (not used)
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -55,12 +50,12 @@ BuildRequires: sbcl
 ## ppc section
 # Thanks David!
 #Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
-#Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+%define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -260,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Apr 09 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-2
+- bootstrap ppc (#511315)
+
 * Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
 - sbcl-1.0.35
 
