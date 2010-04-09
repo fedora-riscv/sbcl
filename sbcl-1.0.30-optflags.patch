@@ -20,8 +20,8 @@ diff -up sbcl-1.0.30/src/runtime/Config.ppc-linux.optflags sbcl-1.0.30/src/runti
 -CFLAGS = -g
 -LINKFLAGS += -v -rdynamic
 +CFLAGS += $(RPM_OPT_FLAGS)
-+LINKFLAGS += -v -rdynamic -Wl,--relax
-+ASFLAGS += -Wa,--longcalls
++LINKFLAGS += -v -rdynamic
++#
  NM = ./linux-nm
  
  ASSEM_SRC = ppc-assem.S ldso-stubs.S
