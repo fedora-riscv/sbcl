@@ -161,12 +161,6 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 # http://bugzilla.redhat.com/214568
 #touch contrib/sb-bsd-sockets/test-passed
 
-# WORKAROUND ppc linker issue
-%ifarch ppc
-#export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mlongcall"; 
-#echo "RPM_OPT_FLAGS: $RPM_OPT_FLAGS"
-%endif
-
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
