@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.35
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -50,12 +50,12 @@ BuildRequires: sbcl
 ## ppc section
 # Thanks David!
 #Source30: sbcl-1.0.1-patched_el4-powerpc-linux.tar.bz2
-Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
+#Source30: sbcl-1.0.1-patched-powerpc-linux.tar.bz2
 %ifarch ppc 
 %define sbcl_arch ppc
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -a 30
 %endif
 
 ## sparc section
@@ -153,17 +153,10 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
 #define my_setarch ./my_setarch
 
-# WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
-# http://bugzilla.redhat.com/169506
-#touch contrib/sb-posix/test-passed
-# WORKAROUND sb-bsd-sockets test failures
-# http://bugzilla.redhat.com/214568
-#touch contrib/sb-bsd-sockets/test-passed
-
-%ifarch ppc
-# WORKAROUND failure in bootstrap
-touch contrib/sb-introspect/test-passed
-%endif
+#ifarch ppc
+## WORKAROUND failure in bootstrap
+#touch contrib/sb-introspect/test-passed
+#endif
 
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
@@ -254,6 +247,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Apr 10 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-3
+- rebuild 
+
 * Fri Apr 09 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-2
 - bootstrap ppc (#511315)
 
