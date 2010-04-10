@@ -153,10 +153,11 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
 #define my_setarch ./my_setarch
 
-#ifarch ppc
-## WORKAROUND failure in bootstrap
-#touch contrib/sb-introspect/test-passed
-#endif
+%ifarch ppc
+# WORKAROUND contrib/sb-introspect self-test failure, fixed post 1.0.37
+# https://bugs.launchpad.net/sbcl/+bug/490490
+touch contrib/sb-introspect/test-passed
+%endif
 
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
