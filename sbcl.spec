@@ -140,6 +140,17 @@ find . -name '*.c' | xargs chmod 644
 # set version.lisp-expr
 sed -i.rpmver -e "s|\"%{version}\"|\"%{version}-%{release}\"|" version.lisp-expr
 
+%ifarch sparcv9
+# WORKAROUND contrib/sb-rotate-byte failure
+# https://bugzilla.redhat.com/show_bug.cgi?id=581182 
+# https://bugs.launchpad.net/sbcl/+bug/559253
+rm -rf contrib/sb-rotate-byte/
+# sb-md5 depends on rotate-byte
+rm -rf contrib/sb-md5
+# sb-cover depends on md5
+rm -rf contrib/sb-cover
+%endif
+
 
 %build
 
@@ -250,6 +261,7 @@ rm -rf %{buildroot}
 %changelog
 * Sat Apr 10 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-3
 - rebuild 
+- workaround sparc failure (#581182, lp#559253)
 
 * Fri Apr 09 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-2
 - bootstrap ppc (#511315)
