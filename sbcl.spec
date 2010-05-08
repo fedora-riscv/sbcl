@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.38
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -26,7 +26,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
-# Pre-generated html docs (not used)
+# Pre-generated html docs
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 Source2: customize-target-features.lisp 
 
@@ -104,11 +104,11 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src}
+%setup -q %{?sbcl_bootstrap_src} 
 
 # Handle pre-generated docs
 if [ -d %{name}-%{version}/doc/manual ]; then
-  mv %{name}-%{version}/doc/manual/* doc/manual/
+mv %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
@@ -167,6 +167,13 @@ export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 
 # docs
 make -C doc/manual html info
+
+# shorten long doc file names close to maxpathlen
+pushd doc/manual/sbcl
+method_sockets=$(basename $(ls Method-sb*sockets*.html) .html)
+mv "${method_sockets}.html" Method-sockets.html
+sed -i -e "s|${method_sockets}|Method-sockets|" General-Sockets.html
+popd
 
 
 %check
@@ -250,6 +257,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
+- shorten docs dangerously close to maxpathlen
+
 * Fri Apr 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-1
 - sbcl-1.0.38
 
