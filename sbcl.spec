@@ -15,17 +15,18 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.35
-Release: 3%{?dist}
+Version: 1.0.38
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
-# Pre-generated html docs (not used)
+# Pre-generated html docs
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 Source2: customize-target-features.lisp 
 
@@ -103,11 +104,11 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src}
+%setup -q %{?sbcl_bootstrap_src} 
 
 # Handle pre-generated docs
 if [ -d %{name}-%{version}/doc/manual ]; then
-  mv %{name}-%{version}/doc/manual/* doc/manual/
+mv %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
@@ -140,17 +141,6 @@ find . -name '*.c' | xargs chmod 644
 # set version.lisp-expr
 sed -i.rpmver -e "s|\"%{version}\"|\"%{version}-%{release}\"|" version.lisp-expr
 
-%ifarch sparcv9
-# WORKAROUND contrib/sb-rotate-byte failure
-# https://bugzilla.redhat.com/show_bug.cgi?id=581182 
-# https://bugs.launchpad.net/sbcl/+bug/559253
-rm -rf contrib/sb-rotate-byte/
-# sb-md5 depends on rotate-byte
-rm -rf contrib/sb-md5
-# sb-cover depends on md5
-rm -rf contrib/sb-cover
-%endif
-
 
 %build
 
@@ -164,11 +154,14 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 #%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
 #define my_setarch ./my_setarch
 
-%ifarch ppc
-# WORKAROUND contrib/sb-introspect self-test failure, fixed post 1.0.37
-# https://bugs.launchpad.net/sbcl/+bug/490490
-touch contrib/sb-introspect/test-passed
-%endif
+# WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
+# http://bugzilla.redhat.com/169506
+#touch contrib/sb-posix/test-passed
+# WORKAROUND sb-bsd-sockets test failures
+# http://bugzilla.redhat.com/214568
+#touch contrib/sb-bsd-sockets/test-passed
+# WORKAROUND sb-concurrency test failures in koji/mock
+touch contrib/sb-concurrency/test-passed
 
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
@@ -176,6 +169,13 @@ export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 
 # docs
 make -C doc/manual html info
+
+# shorten long doc file names close to maxpathlen
+pushd doc/manual/sbcl
+method_sockets=$(basename $(ls Method-sb*sockets*.html) .html)
+mv "${method_sockets}.html" Method-sockets.html
+sed -i -e "s|${method_sockets}|Method-sockets|" General-Sockets.html
+popd
 
 
 %check
@@ -259,12 +259,14 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat Apr 10 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-3
-- rebuild 
-- workaround sparc failure (#581182, lp#559253)
+* Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
+- shorten docs dangerously close to maxpathlen
 
-* Fri Apr 09 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-2
-- bootstrap ppc (#511315)
+* Fri Apr 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-1
+- sbcl-1.0.38
+
+* Wed Apr 07 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.37-1
+- sbcl-1.0.37
 
 * Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
 - sbcl-1.0.35
