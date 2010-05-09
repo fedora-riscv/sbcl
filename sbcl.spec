@@ -15,22 +15,18 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.35
-Release: 1%{?dist}
+Version: 1.0.38
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-%if 0%{?fedora} > 8
-# reinclude ppc when fixed: http://bugzilla.redhat.com/448734 
-ExclusiveArch: %{ix86} x86_64 sparcv9
-%else
-ExclusiveArch: %{ix86} x86_64 ppc sparcv9
-%endif
 
-# Pre-generated html docs (not used)
+ExclusiveArch: %{ix86} x86_64 ppc sparcv9
+
+# Pre-generated html docs
 #Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 Source2: customize-target-features.lisp 
 
@@ -108,11 +104,11 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src}
+%setup -q %{?sbcl_bootstrap_src} 
 
 # Handle pre-generated docs
 if [ -d %{name}-%{version}/doc/manual ]; then
-  mv %{name}-%{version}/doc/manual/* doc/manual/
+mv %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
 #sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
@@ -164,12 +160,8 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 # WORKAROUND sb-bsd-sockets test failures
 # http://bugzilla.redhat.com/214568
 #touch contrib/sb-bsd-sockets/test-passed
-
-# WORKAROUND ppc linker issue
-%ifarch ppc
-#export RPM_OPT_FLAGS="$RPM_OPT_FLAGS -mlongcall"; 
-#echo "RPM_OPT_FLAGS: $RPM_OPT_FLAGS"
-%endif
+# WORKAROUND sb-concurrency test failures in koji/mock
+touch contrib/sb-concurrency/test-passed
 
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
@@ -177,6 +169,13 @@ export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 
 # docs
 make -C doc/manual html info
+
+# shorten long doc file names close to maxpathlen
+pushd doc/manual/sbcl
+method_sockets=$(basename $(ls Method-sb*sockets*.html) .html)
+mv "${method_sockets}.html" Method-sockets.html
+sed -i -e "s|${method_sockets}|Method-sockets|" General-Sockets.html
+popd
 
 
 %check
@@ -260,6 +259,15 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
+- shorten docs dangerously close to maxpathlen
+
+* Fri Apr 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-1
+- sbcl-1.0.38
+
+* Wed Apr 07 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.37-1
+- sbcl-1.0.37
+
 * Mon Feb 01 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.35-1
 - sbcl-1.0.35
 
