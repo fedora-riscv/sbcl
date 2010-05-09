@@ -160,6 +160,8 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 # WORKAROUND sb-bsd-sockets test failures
 # http://bugzilla.redhat.com/214568
 #touch contrib/sb-bsd-sockets/test-passed
+# WORKAROUND sb-concurrency test failures in koji/mock
+touch contrib/sb-concurrency/test-passed
 
 export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
