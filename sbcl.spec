@@ -15,8 +15,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.38
-Release: 2%{?dist}
+Version: 1.0.40
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -259,6 +259,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Jul 17 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.40-1
+- sbcl-1.0.40
+
 * Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
 - shorten docs dangerously close to maxpathlen
 
