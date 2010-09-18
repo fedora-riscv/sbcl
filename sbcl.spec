@@ -15,7 +15,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.41
+Version: 1.0.42
 Release: 1%{?dist}
 
 License: BSD
@@ -80,10 +80,8 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
 Patch3: sbcl-1.0.30-optflags.patch
-Patch4: sbcl-0.9.17-LIB_DIR.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
@@ -111,12 +109,8 @@ if [ -d %{name}-%{version}/doc/manual ]; then
 mv %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
-#sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
-#or patch to use SBCL_HOME env var
-%patch1 -p1 -b .default_sbcl_home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
-%patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
 
@@ -163,9 +157,12 @@ export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 # WORKAROUND sb-concurrency test failures in koji/mock
 touch contrib/sb-concurrency/test-passed
 
-export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
+export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
+%{?setarch} %{?my_setarch} %{?sbcl_shell} \
+./make.sh \
+  --prefix=%{_prefix} \
+  %{?bootstrap}
 
 # docs
 make -C doc/manual html info
@@ -204,7 +201,6 @@ mkdir -p %{buildroot}{%{_bindir},%{_prefix}/lib,%{_mandir}}
 
 unset SBCL_HOME 
 export INSTALL_ROOT=%{buildroot}%{_prefix} 
-export LIB_DIR=%{buildroot}%{_prefix}/lib
 %{?sbcl_shell} ./install.sh 
 
 %if 0%{?common_lisp_controller}
@@ -259,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Sep 18 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.42-1
+- sbcl-1.0.42
+
 * Mon Aug 16 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.41-1
 - sbcl-1.0.41
 
