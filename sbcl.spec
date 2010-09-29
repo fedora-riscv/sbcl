@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.42
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -255,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed Sep 29 2010 jkeating - 1.0.42-2
+- Rebuilt for gcc bug 634757
+
 * Sat Sep 18 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.42-1
 - sbcl-1.0.42
 
