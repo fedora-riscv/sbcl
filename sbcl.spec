@@ -15,7 +15,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.42
+Version: 1.0.43
 Release: 1%{?dist}
 
 License: BSD
@@ -167,13 +167,6 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
 # docs
 make -C doc/manual html info
 
-# shorten long doc file names close to maxpathlen
-pushd doc/manual/sbcl
-method_sockets=$(basename $(ls Method-sb*sockets*.html) .html)
-mv "${method_sockets}.html" Method-sockets.html
-sed -i -e "s|${method_sockets}|Method-sockets|" General-Sockets.html
-popd
-
 
 %check
 ERROR=0
@@ -189,7 +182,7 @@ for CONTRIB in $CONTRIBS ; do
 done
 pushd tests 
 # still seeing periodic thread.impure failure(s) in koji
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh 
 popd
 exit $ERROR
 
@@ -238,12 +231,13 @@ fi
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc STYLE PRINCIPLES
-%{_bindir}/*
+%{_bindir}/sbcl
 %{_prefix}/lib/sbcl/
-%{_mandir}/man?/*
-%doc doc/manual/sbcl
-%doc doc/manual/asdf
-%{_infodir}/*
+%{_mandir}/man1/sbcl.1*
+%doc doc/manual/sbcl.html
+%doc doc/manual/asdf.html
+%{_infodir}/asdf.info*
+%{_infodir}/sbcl.info*
 %if 0%{?common_lisp_controller}
 %{_prefix}/lib/common-lisp/bin/*
 %{_sysconfdir}/*
@@ -255,6 +249,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Sep 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.43-1
+- sbcl-1.0.43
+
 * Sat Sep 18 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.42-1
 - sbcl-1.0.42
 
