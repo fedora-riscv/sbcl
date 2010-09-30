@@ -7,12 +7,6 @@
 #define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
-# threading support
-## Enable sb-thread
-%ifarch %{ix86} x86_64
-%{?!_without_threads:%global _with_threads --with-threads}
-%endif
-
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.43
@@ -113,13 +107,6 @@ fi
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
-
-%if 0%{?_with_threads:1}
-## Enable sb-thread
-#sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
-# or
-install -m644 -p %{SOURCE2} ./customize-target-features.lisp
-%endif
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -251,6 +238,11 @@ rm -rf %{buildroot}
 %changelog
 * Thu Sep 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.43-1
 - sbcl-1.0.43
+- remove explict threading options, already enabled by default where
+  it makes sense
+
+* Wed Sep 29 2010 jkeating - 1.0.42-2
+- Rebuilt for gcc bug 634757
 
 * Sat Sep 18 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.42-1
 - sbcl-1.0.42
