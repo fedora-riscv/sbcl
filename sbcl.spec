@@ -3,6 +3,14 @@
 %define common_lisp_controller 1
 %endif
 
+# generate/package docs
+%ifnarch sparcv9
+## texinfo seems borked on sparc atm 
+## fixme/todo : pregenerate info docs too, so we can skip 
+## this altogether -- Rex
+%define doc 1
+%endif
+
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
@@ -21,7 +29,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
 # Pre-generated html docs
-#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
+Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 Source2: customize-target-features.lisp 
 
 ## x86 section
@@ -96,7 +104,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src} 
+%setup -q %{?sbcl_bootstrap_src} -a 1
 
 # Handle pre-generated docs
 if [ -d %{name}-%{version}/doc/manual ]; then
@@ -152,7 +160,9 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
   %{?bootstrap}
 
 # docs
-make -C doc/manual html info
+%if 0%{?doc}
+make -C doc/manual info
+%endif
 
 
 %check
@@ -169,7 +179,7 @@ for CONTRIB in $CONTRIBS ; do
 done
 pushd tests 
 # still seeing periodic thread.impure failure(s) in koji
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh 
 popd
 exit $ERROR
 
@@ -202,14 +212,18 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %post
+%if 0%{?doc}
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
+%endif
 /usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 
 %preun
 if [ $1 -eq 0 ]; then
+%if 0%{?doc}
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
+%endif
   /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 fi
 
@@ -223,8 +237,10 @@ fi
 %{_mandir}/man1/sbcl.1*
 %doc doc/manual/sbcl.html
 %doc doc/manual/asdf.html
+%if 0%{?doc}
 %{_infodir}/asdf.info*
 %{_infodir}/sbcl.info*
+%endif
 %if 0%{?common_lisp_controller}
 %{_prefix}/lib/common-lisp/bin/*
 %{_sysconfdir}/*
