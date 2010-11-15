@@ -1,5 +1,5 @@
 
-%if 0%{?fedora} > 9
+%if (0%{?fedora} > 9) || (0%{?rhel} > 5)
 %define common_lisp_controller 1
 %endif
 
@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.38
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -259,6 +259,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Nov 15 2010 Anthony Green <green@fedoraproject.org> - 1.0.38-3
+- Use common-lisp-controller on RHEL6 and above.
+
 * Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
 - shorten docs dangerously close to maxpathlen
 
