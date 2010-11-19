@@ -259,7 +259,7 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Mon Nov 15 2010 Anthony Green <green@fedoraproject.org> - 1.0.38-3
+* Fri Nov 19 2010 Anthony Green <green@fedoraproject.org> - 1.0.38-3
 - Use common-lisp-controller on RHEL6 and above.
 
 * Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
