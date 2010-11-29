@@ -1,5 +1,5 @@
 
-%if 0%{?fedora} > 9
+%if 0%{?fedora} > 9 || 0%{?rhel} > 5
 %define common_lisp_controller 1
 %endif
 
@@ -18,7 +18,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.43
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -92,6 +92,8 @@ Patch7: sbcl-1.0.2-permissive.patch
 
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
+# %%check/tests
+BuildRequires: ed
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
@@ -178,8 +180,7 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-# still seeing periodic thread.impure failure(s) in koji
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh || ERROR=1
 popd
 exit $ERROR
 
@@ -252,6 +253,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Nov 29 2010 Rex Dieter <rdieter@fedoraproject.org> -  1.0.43-2
+- BR: ed (for %%check , tests)
+
 * Thu Sep 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.43-1
 - sbcl-1.0.43
 - remove explict threading options, already enabled by default where
