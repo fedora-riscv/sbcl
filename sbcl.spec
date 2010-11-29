@@ -180,7 +180,7 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh || ERROR=1
+time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
