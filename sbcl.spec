@@ -8,7 +8,7 @@
 ## texinfo seems borked on sparc atm 
 ## fixme/todo : pregenerate info docs too, so we can skip 
 ## this altogether -- Rex
-%define doc 1
+%define docs 1
 %endif
 
 # define to enable verbose build for debugging
@@ -17,8 +17,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.44
-Release: 2%{?dist}
+Version: 1.0.46
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -94,10 +94,12 @@ Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 # %%check/tests
 BuildRequires: ed
+%if 0%{?docs}
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
 BuildRequires: time
+%endif
 
 %description
 Steel Bank Common Lisp (SBCL) is a Open Source development environment
@@ -162,7 +164,7 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
   %{?bootstrap}
 
 # docs
-%if 0%{?doc}
+%if 0%{?docs}
 make -C doc/manual info
 %endif
 
@@ -213,7 +215,7 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %post
-%if 0%{?doc}
+%if 0%{?docs}
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
 %endif
@@ -221,7 +223,7 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 %preun
 if [ $1 -eq 0 ]; then
-%if 0%{?doc}
+%if 0%{?docs}
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
 %endif
@@ -238,7 +240,7 @@ fi
 %{_mandir}/man1/sbcl.1*
 %doc doc/manual/sbcl.html
 %doc doc/manual/asdf.html
-%if 0%{?doc}
+%if 0%{?docs}
 %{_infodir}/asdf.info*
 %{_infodir}/sbcl.info*
 %endif
@@ -253,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri Mar 04 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.46-1
+- 1.0.46
+
 * Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.44-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
