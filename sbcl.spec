@@ -17,7 +17,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.50
+Version: 1.0.51
 Release: 1%{?dist}
 
 License: BSD
@@ -255,6 +255,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sun Aug 21 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.51-1
+- 1.0.51
+
 * Tue Jul 12 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.50-1
 - 1.0.50
 
