@@ -18,7 +18,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.0.51
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -30,7 +30,6 @@ ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
-Source2: customize-target-features.lisp 
 
 ## x86 section
 #Source10: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-linux-binary.tar.bz2
@@ -70,8 +69,6 @@ BuildRequires: sbcl
 #define sbcl_bootstrap_src -a 40 
 %endif
 
-Source100: my_setarch.c
-
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -87,6 +84,9 @@ Patch3: sbcl-1.0.30-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
+
+## upstreamable patches
+Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
 
@@ -119,6 +119,7 @@ fi
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch7 -p1 -b .permissive
+%patch50 -p1 -b .generate_version
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -143,22 +144,12 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
-#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-#define my_setarch ./my_setarch
-
-# WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
-# http://bugzilla.redhat.com/169506
-#touch contrib/sb-posix/test-passed
-# WORKAROUND sb-bsd-sockets test failures
-# http://bugzilla.redhat.com/214568
-#touch contrib/sb-bsd-sockets/test-passed
 # WORKAROUND sb-concurrency test failures in koji/mock
 touch contrib/sb-concurrency/test-passed
 
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} %{?sbcl_shell} \
+%{?sbcl_shell} \
 ./make.sh \
   --prefix=%{_prefix} \
   %{?bootstrap}
@@ -182,7 +173,9 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+# verify --version output
+test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
+time %{?sbcl_shell} ./run-tests.sh
 popd
 exit $ERROR
 
@@ -255,6 +248,10 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Aug 22 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.51-2
+- drop unused-for-a-long-time my_setarch.c
+- fix sbcl --version output if built within git checkout
+
 * Sun Aug 21 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.51-1
 - 1.0.51
 
