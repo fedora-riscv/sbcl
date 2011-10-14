@@ -80,7 +80,7 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.30-optflags.patch
+Patch3: sbcl-1.0.52-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 # Allow override of contrib test failure(s)
 Patch7: sbcl-1.0.2-permissive.patch
