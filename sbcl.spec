@@ -1,6 +1,6 @@
 
 %if 0%{?fedora} > 9 || 0%{?rhel} > 5
-%define common_lisp_controller 1
+#define common_lisp_controller 1
 %endif
 
 # generate/package docs
@@ -17,8 +17,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.53
-Release: 2%{?dist}
+Version: 1.0.54
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -80,10 +80,8 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.52-optflags.patch
+Patch3: sbcl-1.0.54-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
-# Allow override of contrib test failure(s)
-Patch7: sbcl-1.0.2-permissive.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.0.51-generate_version.patch
@@ -118,7 +116,6 @@ fi
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%patch7 -p1 -b .permissive
 %patch50 -p1 -b .generate_version
 
 # "install" local bootstrap
@@ -143,9 +140,6 @@ sed -i.rpmver -e "s|\"%{version}\"|\"%{version}-%{release}\"|" version.lisp-expr
 export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
-
-# WORKAROUND sb-concurrency test failures in koji/mock
-touch contrib/sb-concurrency/test-passed
 
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
@@ -249,8 +243,8 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat Jan 14 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.53-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+* Mon Dec 05 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.54-1
+- 1.0.54
 
 * Mon Nov 07 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.53-1
 - 1.0.53
