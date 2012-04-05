@@ -17,7 +17,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.54
+Version: 1.0.55
 Release: 1%{?dist}
 
 License: BSD
@@ -108,11 +108,6 @@ interpreter, and debugger.
 %prep
 %setup -q %{?sbcl_bootstrap_src} -a 1
 
-# Handle pre-generated docs
-if [ -d %{name}-%{version}/doc/manual ]; then
-mv %{name}-%{version}/doc/manual/* doc/manual/
-fi
-
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
@@ -152,6 +147,11 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
 %if 0%{?docs}
 make -C doc/manual info
 %endif
+
+# Handle pre-generated docs
+if [ -d %{name}-%{version}/doc/manual ]; then
+cp -a %{name}-%{version}/doc/manual/* doc/manual/
+fi
 
 
 %check
@@ -243,6 +243,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Thu Apr 05 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.55-1
+- 1.0.55
+
 * Mon Dec 05 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.54-1
 - 1.0.54
 
