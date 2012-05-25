@@ -1,6 +1,6 @@
 
 %if 0%{?fedora} > 9 || 0%{?rhel} > 5
-#define common_lisp_controller 1
+%define common_lisp_controller 1
 %endif
 
 # generate/package docs
@@ -17,7 +17,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.56
+Version: 1.0.57
 Release: 1%{?dist}
 
 License: BSD
@@ -88,11 +88,11 @@ Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
 
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
 # %%check/tests
 BuildRequires: ed
 %if 0%{?docs}
+Requires(post): /sbin/install-info
+Requires(preun): /sbin/install-info
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
@@ -207,7 +207,9 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
 %endif
+%if 0%{?common_lisp_controller}
 /usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
+%endif
 
 %preun
 if [ $1 -eq 0 ]; then
@@ -215,16 +217,35 @@ if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
 %endif
+%if 0%{?common_lisp_controller}
   /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
+%endif
 fi
-
 
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc PRINCIPLES
 %{_bindir}/sbcl
-%{_prefix}/lib/sbcl/
+%dir %{_prefix}/lib/sbcl/
+%{_prefix}/lib/sbcl/asdf/
+%{_prefix}/lib/sbcl/asdf-install/
+%{_prefix}/lib/sbcl/sb-aclrepl/
+%{_prefix}/lib/sbcl/sb-bsd-sockets/
+%{_prefix}/lib/sbcl/sb-cltl2/
+%{_prefix}/lib/sbcl/sb-concurrency/
+%{_prefix}/lib/sbcl/sb-cover/
+%{_prefix}/lib/sbcl/sb-executable/
+%{_prefix}/lib/sbcl/sb-grovel/
+%{_prefix}/lib/sbcl/sb-introspect/
+%{_prefix}/lib/sbcl/sb-md5/
+%{_prefix}/lib/sbcl/sb-posix/
+%{_prefix}/lib/sbcl/sb-queue/
+%{_prefix}/lib/sbcl/sb-rotate-byte/
+%{_prefix}/lib/sbcl/sb-rt/
+%{_prefix}/lib/sbcl/sb-simple-streams/
+%{_prefix}/lib/sbcl/sb-sprof/
+%{_prefix}/lib/sbcl/site-systems/
 %{_mandir}/man1/sbcl.1*
 %doc doc/manual/sbcl.html
 %doc doc/manual/asdf.html
@@ -234,7 +255,12 @@ fi
 %endif
 %if 0%{?common_lisp_controller}
 %{_prefix}/lib/common-lisp/bin/*
-%{_sysconfdir}/*
+%{_prefix}/lib/sbcl/install-clc.lisp
+%{_prefix}/lib/sbcl/sbcl-dist.core
+%verify(not md5 size) %{_prefix}/lib/sbcl/sbcl.core
+%config(noreplace) %{_sysconfdir}/sbcl.rc
+%else
+%{_prefix}/lib/sbcl/sbcl.core
 %endif
 
 
@@ -243,6 +269,11 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Fri May 25 2012 Rex Dieter <rdieter@fedoraproject.org> 
+- 1.0.57-1
+- sbcl-1.0.57
+- fix/renable common-lisp support (accidentally disabled since 1.0.54-1)
+
 * Thu Apr 12 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.56-1
 - 1.0.56
 
