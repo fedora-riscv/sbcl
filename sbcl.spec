@@ -17,8 +17,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.57
-Release: 2%{?dist}
+Version: 1.0.58
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -269,11 +269,13 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Aug 07 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.58-1
+- 1.0.58
+
 * Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.57-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
-* Fri May 25 2012 Rex Dieter <rdieter@fedoraproject.org> 
-- 1.0.57-1
+* Fri May 25 2012 Rex Dieter <rdieter@fedoraproject.org> - 1.0.57-1
 - sbcl-1.0.57
 - fix/renable common-lisp support (accidentally disabled since 1.0.54-1)
 
