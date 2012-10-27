@@ -1,0 +1,69 @@
+diff -up sbcl-1.1.0/contrib/asdf-module.mk.optflags sbcl-1.1.0/contrib/asdf-module.mk
+--- sbcl-1.1.0/contrib/asdf-module.mk.optflags	2012-10-01 16:51:38.000000000 -0500
++++ sbcl-1.1.0/contrib/asdf-module.mk	2012-10-27 11:53:32.883498972 -0500
+@@ -25,6 +25,8 @@ ifeq (Linux,$(UNAME))
+   EXTRA_CFLAGS=-D_GNU_SOURCE
+ endif
+ 
++EXTRA_CFLAGS += $(RPM_OPT_FLAGS)
++
+ export CC SBCL EXTRA_CFLAGS EXTRA_LDFLAGS
+ 
+ all: $(EXTRA_ALL_TARGETS)
+diff -up sbcl-1.1.0/src/runtime/Config.ppc-linux.optflags sbcl-1.1.0/src/runtime/Config.ppc-linux
+--- sbcl-1.1.0/src/runtime/Config.ppc-linux.optflags	2012-10-01 16:51:38.000000000 -0500
++++ sbcl-1.1.0/src/runtime/Config.ppc-linux	2012-10-27 11:52:39.360159979 -0500
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g -m32
++CFLAGS += -g -m32
+ LINKFLAGS += -v -rdynamic -m32
+ NM = ./linux-nm
+ 
+@@ -19,6 +19,8 @@ ARCH_SRC = ppc-arch.c
+ OS_SRC = linux-os.c ppc-linux-os.c
+ OS_LIBS = -ldl
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ ifdef LISP_FEATURE_GENCGC
+   GC_SRC = gencgc.c
+ else
+diff -up sbcl-1.1.0/src/runtime/Config.sparc-linux.optflags sbcl-1.1.0/src/runtime/Config.sparc-linux
+--- sbcl-1.1.0/src/runtime/Config.sparc-linux.optflags	2012-10-01 16:51:38.000000000 -0500
++++ sbcl-1.1.0/src/runtime/Config.sparc-linux	2012-10-27 11:52:39.360159979 -0500
+@@ -22,6 +22,8 @@ ifdef LISP_FEATURE_SB_CORE_COMPRESSION
+   OS_LIBS += -lz
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = cheneygc.c
+ 
+ # Nothing to do for after-grovel-headers.
+diff -up sbcl-1.1.0/src/runtime/Config.x86_64-linux.optflags sbcl-1.1.0/src/runtime/Config.x86_64-linux
+--- sbcl-1.1.0/src/runtime/Config.x86_64-linux.optflags	2012-10-01 16:51:38.000000000 -0500
++++ sbcl-1.1.0/src/runtime/Config.x86_64-linux	2012-10-27 11:52:39.361159968 -0500
+@@ -44,6 +44,8 @@ endif
+ 
+ CFLAGS += -fno-omit-frame-pointer
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.
+diff -up sbcl-1.1.0/src/runtime/Config.x86-linux.optflags sbcl-1.1.0/src/runtime/Config.x86-linux
+--- sbcl-1.1.0/src/runtime/Config.x86-linux.optflags	2012-10-01 16:51:38.000000000 -0500
++++ sbcl-1.1.0/src/runtime/Config.x86-linux	2012-10-27 11:52:39.361159968 -0500
+@@ -42,6 +42,8 @@ ifdef LISP_FEATURE_SB_CORE_COMPRESSION
+   OS_LIBS += -lz
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.
