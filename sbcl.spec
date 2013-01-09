@@ -85,6 +85,9 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.0.51-generate_version.patch
+# "SBCL fails to build with glibc 2.17"
+# https://bugs.launchpad.net/sbcl/+bug/1095036
+Patch51: sbcl-1.1.2-new_glibc.patch
 
 ## upstream patches
 
@@ -112,6 +115,7 @@ interpreter, and debugger.
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+%patch51 -p2 -b .new_glibc
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -271,6 +275,7 @@ rm -rf %{buildroot}
 %changelog
 * Tue Jan 08 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.3-1
 - 1.1.3
+- fix build against glibc-2.17 (launchpad#1095036)
 
 * Sat Dec 08 2012 Rex Dieter <rdieter@fedoraproject.org> 1.1.2-1
 - 1.1.2
