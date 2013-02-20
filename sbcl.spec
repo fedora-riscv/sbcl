@@ -98,7 +98,7 @@ Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 # doc generation
 BuildRequires: ghostscript
-BuildRequires: texinfo
+BuildRequires: texinfo-tex
 BuildRequires: time
 %endif
 
