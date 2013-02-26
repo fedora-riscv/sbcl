@@ -203,6 +203,14 @@ find %{buildroot} -name .cvsignore | xargs rm -f
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
+%if ! 0%{?docs}
+%pre
+if [ $1 -gt 0 ]; then
+/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir > /dev/null 2>&1 ||:
+/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir > /dev/null 2>&1 ||:
+fi
+%endif
+
 %post
 %if 0%{?docs}
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
