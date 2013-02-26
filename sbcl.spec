@@ -6,8 +6,6 @@
 # generate/package docs
 %ifnarch sparcv9
 ## texinfo seems borked on sparc atm 
-## fixme/todo : pregenerate info docs too, so we can skip 
-## this altogether -- Rex
 ## f19/texinfo-5.0 is busted, https://bugzilla.redhat.com/913274
 %if 0%{?fedora} < 19
 %define docs 1
@@ -20,7 +18,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.4
+Version: 1.1.5
 Release: 1%{?dist}
 
 License: BSD
@@ -88,9 +86,6 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.0.51-generate_version.patch
-# "SBCL fails to build with glibc 2.17"
-# https://bugs.launchpad.net/sbcl/+bug/1095036
-Patch51: sbcl-1.1.2-new_glibc.patch
 
 ## upstream patches
 
@@ -118,7 +113,6 @@ interpreter, and debugger.
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
-%patch51 -p2 -b .new_glibc
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -276,6 +270,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Feb 26 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.5-1
+- 1.1.5
+
 * Wed Feb 20 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.4-1
 - 1.1.4
 - omit texinfo generation on f19, texinfo-5.0 is borked (#913274)
