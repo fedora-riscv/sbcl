@@ -4,12 +4,9 @@
 %endif
 
 # generate/package docs
-%ifnarch sparcv9
-## texinfo seems borked on sparc atm 
 ## f19/texinfo-5.0 is busted, https://bugzilla.redhat.com/913274
 %if 0%{?fedora} < 19
 %define docs 1
-%endif
 %endif
 
 # define to enable verbose build for debugging
@@ -18,7 +15,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.5
+Version: 1.1.7
 Release: 1%{?dist}
 
 License: BSD
@@ -278,6 +275,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Mon Apr 29 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.7-1
+- 1.1.7
+
 * Tue Feb 26 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.5-1
 - 1.1.5
 
