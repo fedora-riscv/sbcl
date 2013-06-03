@@ -24,21 +24,24 @@ case $1 in
     install-clc)
     echo $0 loading and dumping clc.
     ( cd /usr/lib/sbcl
-         /usr/bin/sbcl --core /usr/lib/sbcl/sbcl-dist.core \
-	   --noinform --sysinit ${RCFILE} --userinit /dev/null \
+         /usr/bin/sbcl \
+           --noinform --disable-ldb --disable-debugger \
+           --core /usr/lib/sbcl/sbcl-dist.core \
+	   --sysinit ${RCFILE} --no-userinit \
 	   --load "/usr/lib/sbcl/install-clc.lisp" # 2> /dev/null
-              mv sbcl-new.core sbcl.core || (echo FAILED ; cp sbcl-dist.core sbcl.core ) )
+              (mv sbcl-new.core sbcl.core && touch sbcl.core --reference=sbcl-dist.core ) || (echo FAILED ; cp -a sbcl-dist.core sbcl.core ) )
     ;;
     remove-clc)
     echo $0 removing clc-enabled image
-    cp /usr/lib/sbcl/sbcl-dist.core /usr/lib/sbcl/sbcl.core
+    cp -a /usr/lib/sbcl/sbcl-dist.core /usr/lib/sbcl/sbcl.core
     ;;
     rebuild)
     echo $0 rebuilding...
     shift
     echo rebuilding $1
-    /usr/bin/sbcl --noinform --sysinit ${RCFILE} --userinit /dev/null \
-             --disable-debugger \
+    /usr/bin/sbcl \
+             --noinform --disable-ldb --disable-debugger \
+             --sysinit ${RCFILE} --no-userinit \
              --eval \
 "(handler-case
      (progn

@@ -1,22 +1,23 @@
-
-%if (0%{?fedora} > 9) || (0%{?rhel} > 5)
+%if 0%{?fedora} > 9 || 0%{?rhel} > 5
 %define common_lisp_controller 1
+%endif
+
+# generate/package docs
+%ifnarch sparcv9
+## texinfo seems borked on sparc atm 
+## fixme/todo : pregenerate info docs too, so we can skip 
+## this altogether -- Rex
+%define docs 1
 %endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
-# threading support
-## Enable sb-thread
-%ifarch %{ix86} x86_64
-%{?!_without_threads:%global _with_threads --with-threads}
-%endif
-
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.0.38
-Release: 3%{?dist}
+Version: 1.1.2
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -27,8 +28,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
 # Pre-generated html docs
-#Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
-Source2: customize-target-features.lisp 
+Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
 
 ## x86 section
 #Source10: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.15-x86-linux-binary.tar.bz2
@@ -68,8 +68,6 @@ BuildRequires: sbcl
 #define sbcl_bootstrap_src -a 40 
 %endif
 
-Source100: my_setarch.c
-
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -80,22 +78,25 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch1: sbcl-1.0.25-default_sbcl_home.patch
 Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.0.30-optflags.patch
-Patch4: sbcl-0.9.17-LIB_DIR.patch
+Patch3: sbcl-1.1.1-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
-# Allow override of contrib test failure(s)
-Patch7: sbcl-1.0.2-permissive.patch
+
+## upstreamable patches
+Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
 
+# %%check/tests
+BuildRequires: ed
+%if 0%{?docs}
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
 BuildRequires: time
+%endif
 
 %description
 Steel Bank Common Lisp (SBCL) is a Open Source development environment
@@ -104,28 +105,12 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src} 
+%setup -q %{?sbcl_bootstrap_src} -a 1
 
-# Handle pre-generated docs
-if [ -d %{name}-%{version}/doc/manual ]; then
-mv %{name}-%{version}/doc/manual/* doc/manual/
-fi
-
-#sed -i -e "s|/usr/local/lib/sbcl/|%{_prefix}/lib/sbcl/|" src/runtime/runtime.c
-#or patch to use SBCL_HOME env var
-%patch1 -p1 -b .default_sbcl_home
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
-%patch4 -p1 -b .LIB_DIR
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%patch7 -p1 -b .permissive
-
-%if 0%{?_with_threads:1}
-## Enable sb-thread
-#sed -i -e "s|; :sb-thread|:sb-thread|" base-target-features.lisp-expr
-# or
-install -m644 -p %{SOURCE2} ./customize-target-features.lisp
-%endif
+%patch50 -p1 -b .generate_version
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -150,33 +135,22 @@ export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
 export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
 %endif
 
-# my_setarch, to set personality, (about) the same as setarch -R, but usable on fc3 too
-#%{__cc} -o my_setarch %{optflags} %{SOURCE100} 
-#define my_setarch ./my_setarch
-
-# WORKAROUND sb-posix STAT.2, STAT.4 test failures (fc3/fc4 only, fc5 passes?)
-# http://bugzilla.redhat.com/169506
-#touch contrib/sb-posix/test-passed
-# WORKAROUND sb-bsd-sockets test failures
-# http://bugzilla.redhat.com/214568
-#touch contrib/sb-bsd-sockets/test-passed
-# WORKAROUND sb-concurrency test failures in koji/mock
-touch contrib/sb-concurrency/test-passed
-
-export DEFAULT_SBCL_HOME=%{_prefix}/lib/sbcl
+export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
-%{?setarch} %{?my_setarch} %{?sbcl_shell} ./make.sh %{?bootstrap}
+%{?sbcl_shell} \
+./make.sh \
+  --prefix=%{_prefix} \
+  %{?bootstrap}
 
 # docs
-make -C doc/manual html info
+%if 0%{?docs}
+make -C doc/manual info
+%endif
 
-# shorten long doc file names close to maxpathlen
-pushd doc/manual/sbcl
-method_sockets=$(basename $(ls Method-sb*sockets*.html) .html)
-mv "${method_sockets}.html" Method-sockets.html
-sed -i -e "s|${method_sockets}|Method-sockets|" General-Sockets.html
-popd
-
+# Handle pre-generated docs
+if [ -d %{name}-%{version}/doc/manual ]; then
+cp -a %{name}-%{version}/doc/manual/* doc/manual/
+fi
 
 %check
 ERROR=0
@@ -191,8 +165,10 @@ for CONTRIB in $CONTRIBS ; do
   fi
 done
 pushd tests 
-# still seeing periodic thread.impure failure(s) in koji
-time %{?setarch} %{?sbcl_shell} ./run-tests.sh ||:
+# verify --version output
+test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
+# still seeing Failure: threads.impure.lisp / (DEBUGGER-NO-HANG-ON-SESSION-LOCK-IF-INTERRUPTED)
+time %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
 
@@ -204,7 +180,6 @@ mkdir -p %{buildroot}{%{_bindir},%{_prefix}/lib,%{_mandir}}
 
 unset SBCL_HOME 
 export INSTALL_ROOT=%{buildroot}%{_prefix} 
-export LIB_DIR=%{buildroot}%{_prefix}/lib
 %{?sbcl_shell} ./install.sh 
 
 %if 0%{?common_lisp_controller}
@@ -226,31 +201,64 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %post
+%if 0%{?docs}
 /sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
 /sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
+%endif
+%if 0%{?common_lisp_controller}
 /usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
+%endif
 
 %preun
 if [ $1 -eq 0 ]; then
+%if 0%{?docs}
   /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
+%endif
+%if 0%{?common_lisp_controller}
   /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
+%endif
 fi
-
 
 %files
 %defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
-%doc STYLE PRINCIPLES
-%{_bindir}/*
-%{_prefix}/lib/sbcl/
-%{_mandir}/man?/*
-%doc doc/manual/sbcl
-%doc doc/manual/asdf
-%{_infodir}/*
+%doc PRINCIPLES
+%{_bindir}/sbcl
+%dir %{_prefix}/lib/sbcl/
+%{_prefix}/lib/sbcl/asdf/
+%{_prefix}/lib/sbcl/asdf-install/
+%{_prefix}/lib/sbcl/sb-aclrepl/
+%{_prefix}/lib/sbcl/sb-bsd-sockets/
+%{_prefix}/lib/sbcl/sb-cltl2/
+%{_prefix}/lib/sbcl/sb-concurrency/
+%{_prefix}/lib/sbcl/sb-cover/
+%{_prefix}/lib/sbcl/sb-executable/
+%{_prefix}/lib/sbcl/sb-grovel/
+%{_prefix}/lib/sbcl/sb-introspect/
+%{_prefix}/lib/sbcl/sb-md5/
+%{_prefix}/lib/sbcl/sb-posix/
+%{_prefix}/lib/sbcl/sb-queue/
+%{_prefix}/lib/sbcl/sb-rotate-byte/
+%{_prefix}/lib/sbcl/sb-rt/
+%{_prefix}/lib/sbcl/sb-simple-streams/
+%{_prefix}/lib/sbcl/sb-sprof/
+%{_prefix}/lib/sbcl/site-systems/
+%{_mandir}/man1/sbcl.1*
+%doc doc/manual/sbcl.html
+%doc doc/manual/asdf.html
+%if 0%{?docs}
+%{_infodir}/asdf.info*
+%{_infodir}/sbcl.info*
+%endif
 %if 0%{?common_lisp_controller}
 %{_prefix}/lib/common-lisp/bin/*
-%{_sysconfdir}/*
+%{_prefix}/lib/sbcl/install-clc.lisp
+%{_prefix}/lib/sbcl/sbcl-dist.core
+%verify(not md5 size) %{_prefix}/lib/sbcl/sbcl.core
+%config(noreplace) %{_sysconfdir}/sbcl.rc
+%else
+%{_prefix}/lib/sbcl/sbcl.core
 %endif
 
 
@@ -259,8 +267,76 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Fri Nov 19 2010 Anthony Green <green@fedoraproject.org> - 1.0.38-3
-- Use common-lisp-controller on RHEL6 and above.
+* Sat Dec 08 2012 Rex Dieter <rdieter@fedoraproject.org> 1.1.2-1
+- 1.1.2
+
+* Fri Nov 02 2012 Rex Dieter <rdieter@fedoraproject.org> 1.1.1-1
+- 1.1.1
+
+* Sat Oct 27 2012 Rex Dieter <rdieter@fedoraproject.org> 1.1.0-1
+- 1.1.0
+
+* Tue Aug 07 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.58-1
+- 1.0.58
+
+* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.57-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
+* Fri May 25 2012 Rex Dieter <rdieter@fedoraproject.org> - 1.0.57-1
+- sbcl-1.0.57
+- fix/renable common-lisp support (accidentally disabled since 1.0.54-1)
+
+* Thu Apr 12 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.56-1
+- 1.0.56
+
+* Thu Apr 05 2012 Rex Dieter <rdieter@fedoraproject.org> 1.0.55-1
+- 1.0.55
+
+* Mon Dec 05 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.54-1
+- 1.0.54
+
+* Mon Nov 07 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.53-1
+- 1.0.53
+
+* Fri Oct 14 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.52-1
+- 1.0.52
+
+* Mon Aug 22 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.51-2
+- drop unused-for-a-long-time my_setarch.c
+- fix sbcl --version output if built within git checkout
+
+* Sun Aug 21 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.51-1
+- 1.0.51
+
+* Tue Jul 12 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.50-1
+- 1.0.50
+
+* Fri Mar 04 2011 Rex Dieter <rdieter@fedoraproject.org> 1.0.46-1
+- 1.0.46
+
+* Wed Feb 09 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.44-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Mon Nov 29 2010 Rex Dieter <rdieter@fedoraproject.org> -  1.0.44-1
+- sbcl-1.0.44
+- BR: ed (for %%check , tests)
+
+* Thu Sep 30 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.43-1
+- sbcl-1.0.43
+- remove explict threading options, already enabled by default where
+  it makes sense
+
+* Wed Sep 29 2010 jkeating - 1.0.42-2
+- Rebuilt for gcc bug 634757
+
+* Sat Sep 18 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.42-1
+- sbcl-1.0.42
+
+* Mon Aug 16 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.41-1
+- sbcl-1.0.41
+
+* Sat Jul 17 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.40-1
+- sbcl-1.0.40
 
 * Sat May 08 2010 Rex Dieter <rdieter@fedoraproject.org> - 1.0.38-2
 - shorten docs dangerously close to maxpathlen
