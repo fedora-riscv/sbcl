@@ -16,7 +16,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.1.8
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -85,6 +85,7 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
+Patch100: sbcl-1.1.8-nconc.patch
 
 # %%check/tests
 BuildRequires: ed
@@ -110,6 +111,7 @@ interpreter, and debugger.
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+%patch100 -p1 -b .nconc
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -275,6 +277,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Tue Jun 04 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.8-2
+- sbcl-1.1.8-nconc.patch (curtesy of jjames)
+
 * Sun Jun 02 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.8-1
 - 1.1.8
 
