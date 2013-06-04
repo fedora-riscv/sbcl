@@ -278,7 +278,7 @@ rm -rf %{buildroot}
 
 %changelog
 * Tue Jun 04 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.8-2
-- sbcl-1.1.8-nconc.patch (curtesy of jjames)
+- sbcl-1.1.8-nconc.patch (courtesy of jjames)
 
 * Sun Jun 02 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.8-1
 - 1.1.8
