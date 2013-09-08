@@ -15,8 +15,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.8
-Release: 3%{?dist}
+Version: 1.1.11
+Release: 1%{?dist}
 
 License: BSD
 Group: 	 Development/Languages
@@ -85,7 +85,6 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
-Patch100: sbcl-1.1.8-nconc.patch
 
 # %%check/tests
 BuildRequires: ed
@@ -111,7 +110,6 @@ interpreter, and debugger.
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
-%patch100 -p1 -b .nconc
 
 # "install" local bootstrap
 %if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
@@ -244,6 +242,7 @@ fi
 %{_prefix}/lib/sbcl/sb-concurrency/
 %{_prefix}/lib/sbcl/sb-cover/
 %{_prefix}/lib/sbcl/sb-executable/
+%{_prefix}/lib/sbcl/sb-gmp/
 %{_prefix}/lib/sbcl/sb-grovel/
 %{_prefix}/lib/sbcl/sb-introspect/
 %{_prefix}/lib/sbcl/sb-md5/
@@ -277,6 +276,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Sat Sep 07 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.11-1
+- 1.1.11
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.8-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
