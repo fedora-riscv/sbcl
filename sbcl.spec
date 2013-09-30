@@ -1,13 +1,11 @@
 
-%if 0%{?fedora} > 9 || 0%{?rhel} > 5
 %define common_lisp_controller 1
-%endif
 
 # generate/package docs
 ## f19/texinfo-5.0 is busted, https://bugzilla.redhat.com/913274
-%if 0%{?fedora} < 19
+#if 0%{?fedora} < 19
 %define docs 1
-%endif
+#endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -15,14 +13,12 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.11
+Version: 1.1.12
 Release: 1%{?dist}
 
 License: BSD
-Group: 	 Development/Languages
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 ExclusiveArch: %{ix86} x86_64 ppc sparcv9
 
@@ -152,30 +148,7 @@ cp -a %{name}-%{version}/doc/manual/* doc/manual/
 fi
 
 
-%check
-ERROR=0
-# santity check, essential contrib modules get built/included? 
-CONTRIBS="sb-posix sb-bsd-sockets"
-for CONTRIB in $CONTRIBS ; do
-  if [ ! -d %{buildroot}%{_prefix}/lib/sbcl/$CONTRIB ]; then
-    echo "WARNING: ${CONTRIB} awol!"
-    ERROR=1 
-    echo "ulimit -a"
-    ulimit -a
-  fi
-done
-pushd tests 
-# verify --version output
-test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
-# still seeing Failure: threads.impure.lisp / (DEBUGGER-NO-HANG-ON-SESSION-LOCK-IF-INTERRUPTED)
-time %{?sbcl_shell} ./run-tests.sh ||:
-popd
-exit $ERROR
-
-
 %install
-rm -rf %{buildroot}
-
 mkdir -p %{buildroot}{%{_bindir},%{_prefix}/lib,%{_mandir}}
 
 unset SBCL_HOME 
@@ -198,6 +171,27 @@ find %{buildroot} -name CVS -type d | xargs rm -rf
 find %{buildroot} -name .cvsignore | xargs rm -f
 # 'test-passed' files from %%check
 find %{buildroot} -name 'test-passed' | xargs rm -vf
+
+
+%check
+ERROR=0
+# sanity check, essential contrib modules get built/included?
+CONTRIBS="sb-posix sb-bsd-sockets"
+for CONTRIB in $CONTRIBS ; do
+  if [ ! -d %{buildroot}%{_prefix}/lib/sbcl/$CONTRIB ]; then
+    echo "WARNING: ${CONTRIB} awol!"
+    ERROR=1
+    echo "ulimit -a"
+    ulimit -a
+  fi
+done
+pushd tests
+# verify --version output
+test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
+# still seeing Failure: threads.impure.lisp / (DEBUGGER-NO-HANG-ON-SESSION-LOCK-IF-INTERRUPTED)
+time %{?sbcl_shell} ./run-tests.sh ||:
+popd
+exit $ERROR
 
 
 %if ! 0%{?docs}
@@ -224,12 +218,11 @@ if [ $1 -eq 0 ]; then
   /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
 %endif
 %if 0%{?common_lisp_controller}
-  /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
+/usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 %endif
 fi
 
 %files
-%defattr(-,root,root)
 %doc BUGS COPYING README CREDITS NEWS TLA TODO
 %doc PRINCIPLES
 %{_bindir}/sbcl
@@ -271,11 +264,12 @@ fi
 %endif
 
 
-%clean
-rm -rf %{buildroot}
-
-
 %changelog
+* Mon Sep 30 2013 Rex Dieter <rdieter@fedoraproject.org> - 1.1.12-1
+- 1.1.12
+- (re)enable makeinfo docs on f19+
+- .spec cleanup
+
 * Sat Sep 07 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.11-1
 - 1.1.11
 
