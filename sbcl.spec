@@ -173,9 +173,9 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 %check
 ERROR=0
 # sanity check, essential contrib modules get built/included?
-CONTRIBS="sb-posix sb-bsd-sockets"
+CONTRIBS="sb-posix.fasl sb-bsd-sockets.fasl"
 for CONTRIB in $CONTRIBS ; do
-  if [ ! -d %{buildroot}%{_prefix}/lib/sbcl/$CONTRIB ]; then
+  if [ ! -d %{buildroot}%{_prefix}/lib/sbcl/contrib/$CONTRIB ]; then
     echo "WARNING: ${CONTRIB} awol!"
     ERROR=1
     echo "ulimit -a"
