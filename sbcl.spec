@@ -2,10 +2,7 @@
 %define common_lisp_controller 1
 
 # generate/package docs
-## f19/texinfo-5.0 is busted, https://bugzilla.redhat.com/913274
-#if 0%{?fedora} < 19
 %define docs 1
-#endif
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -13,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.12
+Version: 1.1.13
 Release: 1%{?dist}
 
 License: BSD
@@ -73,8 +70,8 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch2: sbcl-0.9.5-personality.patch
-Patch3: sbcl-1.1.1-optflags.patch
+Patch2: sbcl-1.1.13-personality.patch
+Patch3: sbcl-1.1.13-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
@@ -164,11 +161,11 @@ cp -p %{buildroot}%{_prefix}/lib/sbcl/sbcl.core %{buildroot}%{_prefix}/lib/sbcl/
 %endif
 
 ## Unpackaged files
-rm -rf %{buildroot}%{_docdir}/sbcl
-rm -f  %{buildroot}%{_infodir}/dir
+rm -rfv %{buildroot}%{_docdir}/sbcl
+rm -fv  %{buildroot}%{_infodir}/dir
 # CVS crud 
-find %{buildroot} -name CVS -type d | xargs rm -rf
-find %{buildroot} -name .cvsignore | xargs rm -f
+find %{buildroot} -name CVS -type d | xargs rm -rfv
+find %{buildroot} -name .cvsignore | xargs rm -fv
 # 'test-passed' files from %%check
 find %{buildroot} -name 'test-passed' | xargs rm -vf
 
@@ -265,6 +262,9 @@ fi
 
 
 %changelog
+* Fri Nov 01 2013 Rex Dieter <rdieter@fedoraproject.org> 1.1.13-1
+- 1.1.13
+
 * Mon Sep 30 2013 Rex Dieter <rdieter@fedoraproject.org> - 1.1.12-1
 - 1.1.12
 - (re)enable makeinfo docs on f19+
