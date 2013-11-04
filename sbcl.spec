@@ -224,24 +224,7 @@ fi
 %doc PRINCIPLES
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
-%{_prefix}/lib/sbcl/asdf/
-%{_prefix}/lib/sbcl/asdf-install/
-%{_prefix}/lib/sbcl/sb-aclrepl/
-%{_prefix}/lib/sbcl/sb-bsd-sockets/
-%{_prefix}/lib/sbcl/sb-cltl2/
-%{_prefix}/lib/sbcl/sb-concurrency/
-%{_prefix}/lib/sbcl/sb-cover/
-%{_prefix}/lib/sbcl/sb-executable/
-%{_prefix}/lib/sbcl/sb-gmp/
-%{_prefix}/lib/sbcl/sb-grovel/
-%{_prefix}/lib/sbcl/sb-introspect/
-%{_prefix}/lib/sbcl/sb-md5/
-%{_prefix}/lib/sbcl/sb-posix/
-%{_prefix}/lib/sbcl/sb-queue/
-%{_prefix}/lib/sbcl/sb-rotate-byte/
-%{_prefix}/lib/sbcl/sb-rt/
-%{_prefix}/lib/sbcl/sb-simple-streams/
-%{_prefix}/lib/sbcl/sb-sprof/
+%{_prefix}/lib/sbcl/contrib/
 %{_prefix}/lib/sbcl/site-systems/
 %{_mandir}/man1/sbcl.1*
 %doc doc/manual/sbcl.html
