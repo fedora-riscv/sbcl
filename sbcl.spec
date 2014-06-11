@@ -119,7 +119,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup -c -n sbcl-%{version} %{?sbcl_bootstrap_src}
+%setup -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
 
