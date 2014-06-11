@@ -2,7 +2,7 @@
 %define common_lisp_controller 1
 
 # generate/package docs
-%define docs 1
+#define docs 1
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -10,14 +10,14 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.1.18
-Release: 2%{?dist}
+Version: 1.2.0
+Release: 0.1.arm_bootstrap%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 
-ExclusiveArch: %{ix86} x86_64 ppc sparcv9
+ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -28,16 +28,17 @@ Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-docum
 %define sbcl_arch x86
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 10 
+#define sbcl_bootstrap_src -b 10
 %endif
 
 ## x86_64 section
-#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.0.17-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 20 
+#define sbcl_bootstrap_src -b 20
+#define sbcl_bootstrap_dir sbcl-1.2.0-x86-64-linux
 %endif
 
 ## ppc section
@@ -48,7 +49,7 @@ BuildRequires: sbcl
 %define sbcl_arch ppc
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 30
+#define sbcl_bootstrap_src -b 30
 %endif
 
 ## sparc section
@@ -57,7 +58,26 @@ BuildRequires: sbcl
 %define sbcl_arch sparc 
 BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -a 40 
+#define sbcl_bootstrap_src -b 40
+%endif
+
+## arm section
+Source50: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armel-linux-binary.tar.bz2
+%ifarch armv5tel
+%define sbcl_arch arm
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -b 50
+%define sbcl_bootstrap_dir sbcl-1.2.0-armel-linux
+%endif
+
+Source60: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armhf-linux-binary.tar.bz2
+%ifarch armv6hl armv7hl
+%define sbcl_arch arm
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -b 60
+%define sbcl_bootstrap_dir sbcl-1.2.0-armhf-vfp
 %endif
 
 %if 0%{?common_lisp_controller}
@@ -73,6 +93,7 @@ Source202: sbcl-install-clc.lisp
 Patch2: sbcl-1.1.13-personality.patch
 Patch3: sbcl-1.1.18-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
+Patch9: sbcl-1.2.0-manual-cheneygc.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.0.51-generate_version.patch
@@ -81,6 +102,7 @@ Patch50: sbcl-1.0.51-generate_version.patch
 
 # %%check/tests
 BuildRequires: ed
+BuildRequires: hostname
 %if 0%{?docs}
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -97,20 +119,20 @@ interpreter, and debugger.
 
 
 %prep
-%setup -q %{?sbcl_bootstrap_src} -a 1
+%setup -c -n sbcl-%{version} %{?sbcl_bootstrap_src}
+
+pushd sbcl-%{version}
 
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%patch50 -p1 -b .generate_version
-
-# "install" local bootstrap
-%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
-mkdir sbcl-bootstrap
-pushd sbcl-*-linux
-INSTALL_ROOT=`pwd`/../sbcl-bootstrap %{?sbcl_shell} ./install.sh
-popd
+%ifarch %{arm}
+# These functions are not defined when using cheneygc,
+# only when using gcg. Arm uses cheneygc, so remove the
+# includes so we can build the docs.
+%{?docs:%patch9 -p1 -b .manual-cheneygc}
 %endif
+%patch50 -p1 -b .generate_version
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -118,34 +140,35 @@ find . -name '*.c' | xargs chmod 644
 # set version.lisp-expr
 sed -i.rpmver -e "s|\"%{version}\"|\"%{version}-%{release}\"|" version.lisp-expr
 
+# make %%doc items available in parent dir to make life easier
+cp -alf BUGS COPYING README CREDITS NEWS TLA TODO PRINCIPLES ..
+ln -s sbcl-%{version}/doc ../doc
+popd
+
 
 %build
-
-# setup local bootstrap
-%if "x%{?sbcl_bootstrap_src}" != "x%{nil}"
-export SBCL_HOME=`pwd`/sbcl-bootstrap/lib/sbcl
-export PATH=`pwd`/sbcl-bootstrap/bin:${PATH}
-%endif
+pushd sbcl-%{version}
 
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?sbcl_shell} \
 ./make.sh \
   --prefix=%{_prefix} \
-  %{?bootstrap}
+  %{?sbcl_bootstrap_dir:--xc-host="`pwd`/../%{sbcl_bootstrap_dir}/run-sbcl.sh"}
 
 # docs
 %if 0%{?docs}
 make -C doc/manual info
-%endif
 
 # Handle pre-generated docs
-if [ -d %{name}-%{version}/doc/manual ]; then
-cp -a %{name}-%{version}/doc/manual/* doc/manual/
-fi
+tar xvjf %{SOURCE1}
+cp -av %{name}-%{version}/doc/manual/* doc/manual/
+%endif
+popd
 
 
 %install
+pushd sbcl-%{version}
 mkdir -p %{buildroot}{%{_bindir},%{_prefix}/lib,%{_mandir}}
 
 unset SBCL_HOME 
@@ -159,6 +182,7 @@ install -m644 -p -D %{SOURCE202} %{buildroot}%{_prefix}/lib/sbcl/install-clc.lis
 # linking ok? -- Rex
 cp -p %{buildroot}%{_prefix}/lib/sbcl/sbcl.core %{buildroot}%{_prefix}/lib/sbcl/sbcl-dist.core
 %endif
+popd
 
 ## Unpackaged files
 rm -rfv %{buildroot}%{_docdir}/sbcl
@@ -171,6 +195,7 @@ find %{buildroot} -name 'test-passed' | xargs rm -vf
 
 
 %check
+pushd sbcl-%{version}
 ERROR=0
 # sanity check, essential contrib modules get built/included?
 CONTRIBS="sb-posix.fasl sb-bsd-sockets.fasl"
@@ -189,6 +214,7 @@ test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' 
 time %{?sbcl_shell} ./run-tests.sh ||:
 popd
 exit $ERROR
+popd
 
 
 %if ! 0%{?docs}
@@ -220,16 +246,16 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files
-%doc BUGS COPYING README CREDITS NEWS TLA TODO
-%doc PRINCIPLES
+%doc COPYING
+%doc BUGS CREDITS NEWS PRINCIPLES README TLA TODO
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
 %{_prefix}/lib/sbcl/contrib/
 %{_prefix}/lib/sbcl/site-systems/
 %{_mandir}/man1/sbcl.1*
+%if 0%{?docs}
 %doc doc/manual/sbcl.html
 %doc doc/manual/asdf.html
-%if 0%{?docs}
 %{_infodir}/asdf.info*
 %{_infodir}/sbcl.info*
 %endif
@@ -245,6 +271,9 @@ fi
 
 
 %changelog
+* Tue Jun 10 2014 Rex Dieter <rdieter@fedoraproject.org> 1.2.0-0.1.arm_bootstrap
+- 1.2.0 (#1104857), arm(bootstrap)
+
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.1.18-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 

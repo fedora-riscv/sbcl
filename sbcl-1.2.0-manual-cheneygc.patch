@@ -1,0 +1,12 @@
+--- sbcl-1.2.0/doc/manual/beyond-ansi.texinfo.manual-cheney	2014-05-27 03:08:00.000000000 -0600
++++ sbcl-1.2.0/doc/manual/beyond-ansi.texinfo	2014-06-03 15:19:01.100732332 -0600
+@@ -147,9 +147,7 @@
+ 
+ @include var-sb-ext-star-gc-run-time-star.texinfo
+ @include fun-sb-ext-bytes-consed-between-gcs.texinfo
+-@include fun-sb-ext-dynamic-space-size.texinfo
+ @include fun-sb-ext-get-bytes-consed.texinfo
+-@include fun-sb-ext-gc-logfile.texinfo
+ @include fun-sb-ext-generation-average-age.texinfo
+ @include fun-sb-ext-generation-bytes-allocated.texinfo
+ @include fun-sb-ext-generation-bytes-consed-between-gcs.texinfo
