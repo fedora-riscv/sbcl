@@ -129,7 +129,6 @@ pushd sbcl-%{version}
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%endif
 %patch50 -p1 -b .generate_version
 %patch110 -p1 -b .0010
 %patch111 -p1 -b .0011
