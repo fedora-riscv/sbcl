@@ -71,7 +71,9 @@ Source50: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armel-lin
 %define sbcl_bootstrap_dir sbcl-1.2.0-armel-linux
 %endif
 
-Source60: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armhf-linux-binary.tar.bz2
+#Source60: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armhf-linux-binary.tar.bz2
+# generated on a fedora20 arm box, sf bootstrap missing sb-gmp
+Source60: sbcl-1.2.0-armhf-linux-binary-2.tar.bz2
 %ifarch armv6hl armv7hl
 %define sbcl_arch arm
 #BuildRequires: sbcl
@@ -130,7 +132,7 @@ pushd sbcl-%{version}
 # These functions are not defined when using cheneygc,
 # only when using gcg. Arm uses cheneygc, so remove the
 # includes so we can build the docs.
-%{?docs:%patch9 -p1 -b .manual-cheneygc}
+%patch9 -p1 -b .manual-cheneygc
 %endif
 %patch50 -p1 -b .generate_version
 
