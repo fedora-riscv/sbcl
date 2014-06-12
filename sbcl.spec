@@ -11,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.2.0
-Release: 0.1.arm_bootstrap%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -65,21 +65,21 @@ BuildRequires: sbcl
 Source50: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armel-linux-binary.tar.bz2
 %ifarch armv5tel
 %define sbcl_arch arm
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -b 50
-%define sbcl_bootstrap_dir sbcl-1.2.0-armel-linux
+#define sbcl_bootstrap_src -b 50
+#define sbcl_bootstrap_dir sbcl-1.2.0-armel-linux
 %endif
 
 #Source60: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armhf-linux-binary.tar.bz2
 # generated on a fedora20 arm box, sf bootstrap missing sb-gmp
-Source60: sbcl-1.2.0-armhf-linux-binary-2.tar.bz2
+#Source60: sbcl-1.2.0-armhf-linux-binary-2.tar.bz2
 %ifarch armv6hl armv7hl
 %define sbcl_arch arm
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -b 60
-%define sbcl_bootstrap_dir sbcl-1.2.0-armhf-vfp
+#define sbcl_bootstrap_src -b 60
+#define sbcl_bootstrap_dir sbcl-1.2.0-armhf-vfp
 %endif
 
 %if 0%{?common_lisp_controller}
@@ -270,6 +270,9 @@ fi
 
 
 %changelog
+* Thu Jun 12 2014 Rex Dieter <rdieter@fedoraproject.org> 1.2.0-2
+- rebuild using native sbcl
+
 * Tue Jun 10 2014 Rex Dieter <rdieter@fedoraproject.org> 1.2.0-0.1.arm_bootstrap
 - 1.2.0 (#1104857), arm(bootstrap)
 
