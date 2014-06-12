@@ -2,7 +2,7 @@
 %define common_lisp_controller 1
 
 # generate/package docs
-#define docs 1
+%define docs 1
 
 # define to enable verbose build for debugging
 #define sbcl_verbose 1 
@@ -95,12 +95,13 @@ Source202: sbcl-install-clc.lisp
 Patch2: sbcl-1.1.13-personality.patch
 Patch3: sbcl-1.2.0-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
-Patch9: sbcl-1.2.0-manual-cheneygc.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
+Patch110: 0010-Implement-gencgc-on-ARM.patch
+Patch111: 0011-Enable-GENCGC-on-ARM.patch
 
 # %%check/tests
 BuildRequires: ed
@@ -128,13 +129,10 @@ pushd sbcl-%{version}
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%ifarch %{arm}
-# These functions are not defined when using cheneygc,
-# only when using gcg. Arm uses cheneygc, so remove the
-# includes so we can build the docs.
-%patch9 -p1 -b .manual-cheneygc
 %endif
 %patch50 -p1 -b .generate_version
+%patch110 -p1 -b .0010
+%patch111 -p1 -b .0011
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
