@@ -10,8 +10,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.2.0
-Release: 2%{?dist}
+Version: 1.2.1
+Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -62,7 +62,7 @@ BuildRequires: sbcl
 %endif
 
 ## arm section
-Source50: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armel-linux-binary.tar.bz2
+#Source50: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-armel-linux-binary.tar.bz2
 %ifarch armv5tel
 %define sbcl_arch arm
 BuildRequires: sbcl
@@ -100,8 +100,6 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 Patch50: sbcl-1.0.51-generate_version.patch
 
 ## upstream patches
-Patch110: 0010-Implement-gencgc-on-ARM.patch
-Patch111: 0011-Enable-GENCGC-on-ARM.patch
 
 # %%check/tests
 BuildRequires: ed
@@ -130,8 +128,6 @@ pushd sbcl-%{version}
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
-%patch110 -p1 -b .0010
-%patch111 -p1 -b .0011
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -270,6 +266,9 @@ fi
 
 
 %changelog
+* Sat Jun 28 2014 Rex Dieter <rdieter@fedoraproject.org> 1.2.1-1
+- 1.2.1
+
 * Thu Jun 12 2014 Rex Dieter <rdieter@fedoraproject.org> 1.2.0-2
 - rebuild using native sbcl
 
