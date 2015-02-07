@@ -1,7 +1,5 @@
 
-%if 0%{?fedora}
 %define common_lisp_controller 1
-%endif
 
 # generate/package docs
 %define docs 1
@@ -13,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.2.7
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -34,13 +32,13 @@ BuildRequires: sbcl
 %endif
 
 ## x86_64 section
-Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.7-x86-64-linux-binary.tar.bz2
+#Source20: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.2.0-x86-64-linux-binary.tar.bz2
 %ifarch x86_64
 %define sbcl_arch x86-64
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -b 20
-%define sbcl_bootstrap_dir sbcl-1.2.7-x86-64-linux
+#define sbcl_bootstrap_src -b 20
+#define sbcl_bootstrap_dir sbcl-1.2.0-x86-64-linux
 %endif
 
 ## ppc section
@@ -268,9 +266,6 @@ fi
 
 
 %changelog
-* Tue Feb 03 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.7-0.1
-- bootstrap epel7
-
 * Sat Jan 03 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.7-1
 - 1.2.7
 
