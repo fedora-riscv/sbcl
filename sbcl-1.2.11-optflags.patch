@@ -1,0 +1,81 @@
+diff -up sbcl-1.2.11/contrib/asdf-module.mk.optflags sbcl-1.2.11/contrib/asdf-module.mk
+--- sbcl-1.2.11/contrib/asdf-module.mk.optflags	2015-04-30 16:55:32.813752766 -0500
++++ sbcl-1.2.11/contrib/asdf-module.mk	2015-04-30 16:56:19.636936144 -0500
+@@ -24,6 +24,8 @@ ifeq (Linux,$(UNAME))
+   EXTRA_CFLAGS=-D_GNU_SOURCE
+ endif
+ 
++EXTRA_CFLAGS += $(RPM_OPT_FLAGS)
++
+ export CC SBCL EXTRA_CFLAGS
+ 
+ all: $(FASL) $(ASD)
+diff -up sbcl-1.2.11/src/runtime/Config.arm-linux.optflags sbcl-1.2.11/src/runtime/Config.arm-linux
+--- sbcl-1.2.11/src/runtime/Config.arm-linux.optflags	2015-04-27 09:56:49.000000000 -0500
++++ sbcl-1.2.11/src/runtime/Config.arm-linux	2015-04-30 16:55:32.813752766 -0500
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g -marm -march=armv5
++CFLAGS += $(RPM_OPT_FLAGS)
+ #LINKFLAGS += -v -rdynamic -m32
+ NM = ./linux-nm
+ 
+diff -up sbcl-1.2.11/src/runtime/Config.ppc-linux.optflags sbcl-1.2.11/src/runtime/Config.ppc-linux
+--- sbcl-1.2.11/src/runtime/Config.ppc-linux.optflags	2015-04-27 09:56:49.000000000 -0500
++++ sbcl-1.2.11/src/runtime/Config.ppc-linux	2015-04-30 16:55:32.814752770 -0500
+@@ -9,7 +9,7 @@
+ # provided with absolutely no warranty. See the COPYING and CREDITS
+ # files for more information.
+ 
+-CFLAGS = -g -m32
++CFLAGS += -g -m32
+ LINKFLAGS += -v -rdynamic -m32
+ NM = ./linux-nm
+ 
+@@ -19,6 +19,8 @@ ARCH_SRC = ppc-arch.c
+ OS_SRC = linux-os.c ppc-linux-os.c
+ OS_LIBS = -ldl
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ ifdef LISP_FEATURE_GENCGC
+   GC_SRC = gencgc.c
+ else
+diff -up sbcl-1.2.11/src/runtime/Config.sparc-linux.optflags sbcl-1.2.11/src/runtime/Config.sparc-linux
+--- sbcl-1.2.11/src/runtime/Config.sparc-linux.optflags	2015-04-27 09:56:49.000000000 -0500
++++ sbcl-1.2.11/src/runtime/Config.sparc-linux	2015-04-30 16:55:32.814752770 -0500
+@@ -28,6 +28,8 @@ else
+   GC_SRC = cheneygc.c
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ # Nothing to do for after-grovel-headers.
+ .PHONY: after-grovel-headers
+ after-grovel-headers:
+diff -up sbcl-1.2.11/src/runtime/Config.x86-64-linux.optflags sbcl-1.2.11/src/runtime/Config.x86-64-linux
+--- sbcl-1.2.11/src/runtime/Config.x86-64-linux.optflags	2015-04-27 09:56:49.000000000 -0500
++++ sbcl-1.2.11/src/runtime/Config.x86-64-linux	2015-04-30 16:55:32.814752770 -0500
+@@ -44,6 +44,8 @@ endif
+ 
+ CFLAGS += -fno-omit-frame-pointer
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Hardened GCC enables PIE by default
+diff -up sbcl-1.2.11/src/runtime/Config.x86-linux.optflags sbcl-1.2.11/src/runtime/Config.x86-linux
+--- sbcl-1.2.11/src/runtime/Config.x86-linux.optflags	2015-04-27 09:56:50.000000000 -0500
++++ sbcl-1.2.11/src/runtime/Config.x86-linux	2015-04-30 16:55:32.814752770 -0500
+@@ -49,6 +49,8 @@ LINKFLAGS += -nopie
+ LDFLAGS += -nopie
+ endif
+ 
++CFLAGS += $(RPM_OPT_FLAGS)
++
+ GC_SRC = gencgc.c
+ 
+ # Nothing to do for after-grovel-headers.

@@ -10,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.2.8
+Version: 1.2.11
 Release: 1%{?dist}
 
 License: BSD
@@ -93,11 +93,11 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.2.8-optflags.patch
+Patch3: sbcl-1.2.11-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
-Patch50: sbcl-1.0.51-generate_version.patch
+Patch50: sbcl-1.2.11-generate_version.patch
 
 ## upstream patches
 
@@ -120,7 +120,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
+%setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
 
@@ -266,6 +266,9 @@ fi
 
 
 %changelog
+* Thu Apr 30 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.11-1
+- 1.2.11
+
 * Fri Feb 13 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.8-1
 - 1.2.8
 
