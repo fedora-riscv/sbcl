@@ -83,7 +83,7 @@ BuildRequires: sbcl
 %endif
 
 ## aarch64 section
-Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.0-arm64-linux-binary.tar.bz2
+#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.0-arm64-linux-binary.tar.bz2
 %ifarch aarch64
 %define sbcl_arch arm64
 #BuildRequires: sbcl
