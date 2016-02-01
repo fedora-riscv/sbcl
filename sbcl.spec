@@ -10,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.3.0
+Version: 1.3.2
 Release: 1%{?dist}
 
 License: BSD
@@ -104,7 +104,7 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.2.11-optflags.patch
+Patch3: sbcl-1.3.2-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
@@ -277,6 +277,9 @@ fi
 
 
 %changelog
+* Mon Feb 01 2016 Rex Dieter <rdieter@fedoraproject.org> 1.3.2-1
+- 1.3.2
+
 * Wed Nov 11 2015 Rex Dieter <rdieter@fedoraproject.org> - 1.3.0-1
 - 1.3.0
 - initial aarch64 support (work in progress)
