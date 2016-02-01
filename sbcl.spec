@@ -155,6 +155,9 @@ popd
 %build
 pushd sbcl-%{version}
 
+export CFLAGS="%{?optflags}"
+export LDFLAGS="%{?__global_ldflags}"
+
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
 %{?sbcl_shell} \
@@ -215,7 +218,7 @@ for CONTRIB in $CONTRIBS ; do
 done
 pushd tests
 # verify --version output
-test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
+test "$(. ./subr.sh; "$SBCL_RUNTIME" --core "$SBCL_CORE" --version --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
 # still seeing Failure: threads.impure.lisp / (DEBUGGER-NO-HANG-ON-SESSION-LOCK-IF-INTERRUPTED)
 time %{?sbcl_shell} ./run-tests.sh ||:
 popd
@@ -257,7 +260,6 @@ fi
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
 %{_prefix}/lib/sbcl/contrib/
-%{_prefix}/lib/sbcl/site-systems/
 %{_mandir}/man1/sbcl.1*
 %if 0%{?docs}
 %doc doc/manual/sbcl.html
