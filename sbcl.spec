@@ -10,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.2.8
+Version: 1.3.11
 Release: 1%{?dist}
 
 License: BSD
@@ -82,6 +82,17 @@ BuildRequires: sbcl
 #define sbcl_bootstrap_dir sbcl-1.2.0-armhf-vfp
 %endif
 
+## aarch64 section
+#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.2-arm64-linux-binary.tar.bz2
+%ifarch aarch64
+%define sbcl_arch arm64
+#BuildRequires: sbcl
+# or
+%define sbcl_bootstrap_src -b 70
+%define sbcl_bootstrap_dir sbcl-1.3.2-arm64-linux
+%endif
+
+
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -93,11 +104,11 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.2.8-optflags.patch
+Patch3: sbcl-1.3.2-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
-Patch50: sbcl-1.0.51-generate_version.patch
+Patch50: sbcl-1.3.0-generate_version.patch
 
 ## upstream patches
 
@@ -120,7 +131,7 @@ interpreter, and debugger.
 
 
 %prep
-%setup -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
+%setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
 
@@ -143,6 +154,9 @@ popd
 
 %build
 pushd sbcl-%{version}
+
+export CFLAGS="%{?optflags}"
+export LDFLAGS="%{?__global_ldflags}"
 
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
@@ -204,7 +218,7 @@ for CONTRIB in $CONTRIBS ; do
 done
 pushd tests
 # verify --version output
-test "$(source ./subr.sh; SBCL_ARGS= run_sbcl --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
+test "$(. ./subr.sh; "$SBCL_RUNTIME" --core "$SBCL_CORE" --version --version 2>/dev/null | cut -d' ' -f2)" = "%{version}-%{release}"
 # still seeing Failure: threads.impure.lisp / (DEBUGGER-NO-HANG-ON-SESSION-LOCK-IF-INTERRUPTED)
 time %{?sbcl_shell} ./run-tests.sh ||:
 popd
@@ -246,7 +260,6 @@ fi
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
 %{_prefix}/lib/sbcl/contrib/
-%{_prefix}/lib/sbcl/site-systems/
 %{_mandir}/man1/sbcl.1*
 %if 0%{?docs}
 %doc doc/manual/sbcl.html
@@ -266,6 +279,46 @@ fi
 
 
 %changelog
+* Mon Nov 21 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.11-1
+- 1.3.11
+
+* Tue Aug 30 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.9-1
+- 1.3.9
+
+* Fri Apr 29 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.5-1
+- 1.3.5
+
+* Mon Apr 04 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.4-1
+- 1.3.4
+
+* Sat Mar 05 2016 Rex Dieter <rdieter@fedoraproject.org> 1.3.3-1
+- 1.3.3
+
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
+* Mon Feb 01 2016 Rex Dieter <rdieter@fedoraproject.org> 1.3.2-1
+- 1.3.2
+
+* Wed Nov 11 2015 Rex Dieter <rdieter@fedoraproject.org> - 1.3.0-1
+- 1.3.0
+- initial aarch64 support (work in progress)
+
+* Thu Oct 01 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.16-1
+- 1.2.16
+
+* Mon Sep 14 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.15-1
+- 1.2.15
+
+* Mon Jun 22 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.12-1
+- 1.2.12
+
+* Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.2.11-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
+* Thu Apr 30 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.11-1
+- 1.2.11
+
 * Fri Feb 13 2015 Rex Dieter <rdieter@fedoraproject.org> 1.2.8-1
 - 1.2.8
 
