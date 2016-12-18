@@ -11,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.3.11
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -92,7 +92,6 @@ BuildRequires: sbcl
 %define sbcl_bootstrap_dir sbcl-1.3.2-arm64-linux
 %endif
 
-
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -112,6 +111,7 @@ Patch50: sbcl-1.3.0-generate_version.patch
 
 ## upstream patches
 
+BuildRequires: zlib-devel
 # %%check/tests
 BuildRequires: ed
 BuildRequires: hostname
@@ -163,6 +163,7 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_shell} \
 ./make.sh \
   --prefix=%{_prefix} \
+  --with-sb-core-compression \
   %{?sbcl_bootstrap_dir:--xc-host="`pwd`/../%{sbcl_bootstrap_dir}/run-sbcl.sh"}
 
 # docs
@@ -279,6 +280,9 @@ fi
 
 
 %changelog
+* Sat Dec 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.11-2
+- %%build: --with-sb-core-compression
+
 * Mon Nov 21 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.11-1
 - 1.3.11
 
