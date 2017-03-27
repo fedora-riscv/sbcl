@@ -258,10 +258,11 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files
-%doc COPYING
+%license COPYING
 %doc BUGS CREDITS NEWS PRINCIPLES README TLA TODO
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
+%{_prefix}/lib/sbcl/sbcl.mk
 %{_prefix}/lib/sbcl/contrib/
 %{_mandir}/man1/sbcl.1*
 %if 0%{?docs}
