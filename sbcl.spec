@@ -10,8 +10,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.3.12
-Release: 2%{?dist}
+Version: 1.3.16
+Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -103,7 +103,7 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.3.2-optflags.patch
+Patch3: sbcl-1.3.16-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
@@ -280,6 +280,9 @@ fi
 
 
 %changelog
+* Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.16-1
+- 1.3.16
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.12-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
