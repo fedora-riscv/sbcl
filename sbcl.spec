@@ -108,6 +108,7 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.3.0-generate_version.patch
+Patch51: sbcl-1.3.16-no_format_security.patch
 
 ## upstream patches
 
@@ -139,6 +140,7 @@ pushd sbcl-%{version}
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+%patch51 -p1 -b .no_format_security
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
