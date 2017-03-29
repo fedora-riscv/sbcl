@@ -11,13 +11,13 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.3.16
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 
-ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9
+ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -83,13 +83,14 @@ BuildRequires: sbcl
 %endif
 
 ## aarch64 section
-#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.2-arm64-linux-binary.tar.bz2
+%define bin_name sbcl-1.3.16-arm64-linux
+Source70: http://downloads.sourceforge.net/sourceforge/sbcl/%{bin_name}-binary.tar.bz2
 %ifarch aarch64
 %define sbcl_arch arm64
 #BuildRequires: sbcl
 # or
 %define sbcl_bootstrap_src -b 70
-%define sbcl_bootstrap_dir sbcl-1.3.2-arm64-linux
+%define sbcl_bootstrap_dir %{bin_name}
 %endif
 
 %if 0%{?common_lisp_controller}
@@ -283,6 +284,9 @@ fi
 
 
 %changelog
+* Wed Mar 29 2017 Than Ngo <than@redhat.com> - 1.3.16-2
+- add support for aarch64
+
 * Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.16-1
 - 1.3.16
 
