@@ -10,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.3.18
+Version: 1.3.17
 Release: 1%{?dist}
 
 License: BSD
@@ -103,7 +103,7 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.3.18-optflags.patch
+Patch3: sbcl-1.3.16-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
@@ -283,8 +283,8 @@ fi
 
 
 %changelog
-* Thu Jun 01 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.18-1
-- 1.3.18, de-bootstrap aarch64
+* Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.17-1
+- 1.3.17, de-bootstrap aarch64
 
 * Wed Mar 29 2017 Than Ngo <than@redhat.com> - 1.3.16-2
 - add support for aarch64
