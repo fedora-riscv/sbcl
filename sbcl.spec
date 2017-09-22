@@ -10,8 +10,8 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.3.19
-Release: 3%{?dist}
+Version: 1.3.21
+Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -283,6 +283,9 @@ fi
 
 
 %changelog
+* Fri Sep 22 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.21-1
+- 1.3.21
+
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.19-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
