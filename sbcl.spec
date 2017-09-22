@@ -111,6 +111,7 @@ Patch50: sbcl-1.3.0-generate_version.patch
 Patch51: sbcl-1.3.16-no_format_security.patch
 
 ## upstream patches
+Patch171: 0171-Use-ucontext_t-instead-of-struct-ucontext-on-linux.patch
 
 BuildRequires: zlib-devel
 # %%check/tests
@@ -141,6 +142,8 @@ pushd sbcl-%{version}
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
 %patch51 -p1 -b .no_format_security
+
+%patch171 -p1 -b .0171
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
