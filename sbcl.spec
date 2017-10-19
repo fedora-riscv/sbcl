@@ -11,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.4.0
-Release: 1%{?dist}
+Release: 0.1%{?dist}.bootstrap
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -83,13 +83,13 @@ BuildRequires: sbcl
 %endif
 
 ## aarch64 section
-#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.16-arm64-linux-binary.tar.bz2
+Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.16-arm64-linux-binary.tar.bz2
 %ifarch aarch64
 %define sbcl_arch arm64
-BuildRequires: sbcl
+#BuildRequires: sbcl
 # or
-#define sbcl_bootstrap_src -b 70
-#define sbcl_bootstrap_dir sbcl-1.3.16-arm64-linux
+%define sbcl_bootstrap_src -b 70
+%define sbcl_bootstrap_dir sbcl-1.3.16-arm64-linux
 %endif
 
 %if 0%{?common_lisp_controller}
