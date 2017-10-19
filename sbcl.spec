@@ -10,14 +10,14 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.3.11
+Version: 1.4.0
 Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 
-ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9
+ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -83,15 +83,14 @@ BuildRequires: sbcl
 %endif
 
 ## aarch64 section
-#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.2-arm64-linux-binary.tar.bz2
+#Source70: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-1.3.16-arm64-linux-binary.tar.bz2
 %ifarch aarch64
 %define sbcl_arch arm64
-#BuildRequires: sbcl
+BuildRequires: sbcl
 # or
-%define sbcl_bootstrap_src -b 70
-%define sbcl_bootstrap_dir sbcl-1.3.2-arm64-linux
+#define sbcl_bootstrap_src -b 70
+#define sbcl_bootstrap_dir sbcl-1.3.16-arm64-linux
 %endif
-
 
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
@@ -104,14 +103,16 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.3.2-optflags.patch
+Patch3: sbcl-1.3.18-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.3.0-generate_version.patch
+Patch51: sbcl-1.3.16-no_format_security.patch
 
 ## upstream patches
 
+BuildRequires: zlib-devel
 # %%check/tests
 BuildRequires: ed
 BuildRequires: hostname
@@ -139,6 +140,7 @@ pushd sbcl-%{version}
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+%patch51 -p1 -b .no_format_security
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -163,6 +165,7 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_shell} \
 ./make.sh \
   --prefix=%{_prefix} \
+  --with-sb-core-compression \
   %{?sbcl_bootstrap_dir:--xc-host="`pwd`/../%{sbcl_bootstrap_dir}/run-sbcl.sh"}
 
 # docs
@@ -255,10 +258,11 @@ if [ $1 -eq 0 ]; then
 fi
 
 %files
-%doc COPYING
+%license COPYING
 %doc BUGS CREDITS NEWS PRINCIPLES README TLA TODO
 %{_bindir}/sbcl
 %dir %{_prefix}/lib/sbcl/
+%{_prefix}/lib/sbcl/sbcl.mk
 %{_prefix}/lib/sbcl/contrib/
 %{_mandir}/man1/sbcl.1*
 %if 0%{?docs}
@@ -279,6 +283,42 @@ fi
 
 
 %changelog
+* Wed Oct 18 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.4.0-1
+- 1.4.0
+
+* Fri Sep 22 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.21-1
+- 1.3.21
+
+* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.19-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
+
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.19-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
+* Thu Jun 29 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.19-1
+- 1.3.19
+
+* Sun Jun 11 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.18-1
+- 1.3.18
+
+* Fri Jun 02 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.17-1
+- 1.3.17, de-bootstrap aarch64
+
+* Wed Mar 29 2017 Than Ngo <than@redhat.com> - 1.3.16-2
+- add support for aarch64
+
+* Mon Mar 27 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.3.16-1
+- 1.3.16
+
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.3.12-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
+* Sun Dec 18 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.12-1
+- 1.3.12
+
+* Sat Dec 17 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.11-2
+- %%build: --with-sb-core-compression
+
 * Mon Nov 21 2016 Rex Dieter <rdieter@fedoraproject.org> - 1.3.11-1
 - 1.3.11
 
