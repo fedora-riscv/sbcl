@@ -111,6 +111,7 @@ Patch50: sbcl-1.3.0-generate_version.patch
 Patch51: sbcl-1.3.16-no_format_security.patch
 
 ## upstream patches
+Patch200: 0200-Hardcode-the-float-area-uc_mcontext-field-on-arm64.patch
 
 BuildRequires: zlib-devel
 # %%check/tests
@@ -135,6 +136,9 @@ interpreter, and debugger.
 %setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
+
+# upstream patches
+%patch200 -p1
 
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
