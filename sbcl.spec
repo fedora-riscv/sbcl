@@ -10,7 +10,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.4.0
+Version: 1.4.2
 Release: 1%{?dist}
 
 License: BSD
@@ -103,15 +103,13 @@ Source202: sbcl-install-clc.lisp
 %endif
 
 Patch2: sbcl-1.1.13-personality.patch
-Patch3: sbcl-1.3.18-optflags.patch
+Patch3: sbcl-1.4.2-optflags.patch
 Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.3.0-generate_version.patch
-Patch51: sbcl-1.3.16-no_format_security.patch
 
 ## upstream patches
-Patch200: 0200-Hardcode-the-float-area-uc_mcontext-field-on-arm64.patch
 
 BuildRequires: zlib-devel
 # %%check/tests
@@ -138,13 +136,11 @@ interpreter, and debugger.
 pushd sbcl-%{version}
 
 # upstream patches
-%patch200 -p1
 
 %patch2 -p1 -b .personality
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
-%patch51 -p1 -b .no_format_security
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -287,6 +283,9 @@ fi
 
 
 %changelog
+* Fri Dec 01 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.4.2-1
+- 1.4.2
+
 * Wed Oct 18 2017 Rex Dieter <rdieter@fedoraproject.org> - 1.4.0-1
 - 1.4.0
 
