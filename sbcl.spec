@@ -11,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.4.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -111,6 +111,7 @@ Patch50: sbcl-1.3.0-generate_version.patch
 
 ## upstream patches
 
+BuildRequires: gcc
 BuildRequires: zlib-devel
 # %%check/tests
 BuildRequires: ed
@@ -283,6 +284,9 @@ fi
 
 
 %changelog
+* Wed Mar 07 2018 Rex Dieter <rdieter@fedoraproject.org> - 1.4.2-3
+- BR: gcc
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
