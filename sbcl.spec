@@ -110,6 +110,7 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 Patch50: sbcl-1.3.0-generate_version.patch
 
 ## upstream patches
+Patch158: 0058-arm32-sb-rotate-byte-fix-a-lifetime-issue.patch
 
 BuildRequires: gcc
 BuildRequires: zlib-devel
@@ -142,6 +143,8 @@ pushd sbcl-%{version}
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+
+%patch158 -p1
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -284,7 +287,7 @@ fi
 
 
 %changelog
-* Fri Apr 06 2018 Rex Dieter <rdieter@fedoraproject.org> - 1.4.6-1
+* Mon Apr 09 2018 Rex Dieter <rdieter@fedoraproject.org> - 1.4.6-1
 - 1.4.6
 
 * Wed Mar 07 2018 Rex Dieter <rdieter@fedoraproject.org> - 1.4.2-3

@@ -1,0 +1,25 @@
+From c529dc9aa94822dbb0eae2d181d413900550c813 Mon Sep 17 00:00:00 2001
+From: Stas Boukarev <stassats@gmail.com>
+Date: Mon, 9 Apr 2018 15:05:27 +0300
+Subject: [PATCH 58/58] arm32/sb-rotate-byte: fix a lifetime issue.
+
+---
+ contrib/sb-rotate-byte/arm-vm.lisp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contrib/sb-rotate-byte/arm-vm.lisp b/contrib/sb-rotate-byte/arm-vm.lisp
+index 3ca5d528e..42966465e 100644
+--- a/contrib/sb-rotate-byte/arm-vm.lisp
++++ b/contrib/sb-rotate-byte/arm-vm.lisp
+@@ -41,7 +41,7 @@
+                (:translate %unsigned-32-rotate-byte)
+                (:note "inline 32-bit rotation")
+                (:args (count :scs (sb-vm::signed-reg) :target res)
+-                      (integer :scs (sb-vm::unsigned-reg)))
++                      (integer :scs (sb-vm::unsigned-reg) :to :save))
+                (:arg-types sb-vm::tagged-num ,arg-type)
+                (:results (res :scs (sb-vm::unsigned-reg)))
+                (:result-types sb-vm::unsigned-byte-32)
+-- 
+2.14.3
+
