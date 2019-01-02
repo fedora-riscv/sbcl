@@ -1,7 +1,7 @@
-diff -up sbcl-1.1.13/src/runtime/linux-os.c.personality sbcl-1.1.13/src/runtime/linux-os.c
---- sbcl-1.1.13/src/runtime/linux-os.c.personality	2013-11-01 12:51:32.229193619 -0500
-+++ sbcl-1.1.13/src/runtime/linux-os.c	2013-11-01 12:53:57.262562418 -0500
-@@ -288,6 +288,10 @@ os_init(char *argv[], char *envp[])
+diff -up sbcl-1.4.14/src/runtime/linux-os.c.personality sbcl-1.4.14/src/runtime/linux-os.c
+--- sbcl-1.4.14/src/runtime/linux-os.c.personality	2018-12-24 08:28:30.346162495 -0600
++++ sbcl-1.4.14/src/runtime/linux-os.c	2018-12-24 08:31:24.922224890 -0600
+@@ -323,6 +323,10 @@ int os_preinit(char *argv[], char *envp[
                      setenv("SBCL_IS_RESTARTING", "T", 1);
                      runtime[i] = '\0';
                      execv(runtime, argv);
@@ -11,4 +11,4 @@ diff -up sbcl-1.1.13/src/runtime/linux-os.c.personality sbcl-1.1.13/src/runtime/
 +                    execvp(argv[0], argv);
                  }
              }
-             /* Either changing the personality or execve() failed. Either
+             /* Either changing the personality or execve() failed.
