@@ -117,8 +117,6 @@ BuildRequires: zlib-devel
 BuildRequires: ed
 BuildRequires: hostname
 %if 0%{?docs}
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
 # doc generation
 BuildRequires: ghostscript
 BuildRequires: texinfo
@@ -229,30 +227,13 @@ popd
 exit $ERROR
 popd
 
-
-%if ! 0%{?docs}
-%pre
-if [ $1 -gt 0 ]; then
-/sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir > /dev/null 2>&1 ||:
-/sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir > /dev/null 2>&1 ||:
-fi
-%endif
-
 %post
-%if 0%{?docs}
-/sbin/install-info %{_infodir}/sbcl.info %{_infodir}/dir ||:
-/sbin/install-info %{_infodir}/asdf.info %{_infodir}/dir ||:
-%endif
 %if 0%{?common_lisp_controller}
 /usr/sbin/register-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 %endif
 
 %preun
 if [ $1 -eq 0 ]; then
-%if 0%{?docs}
-  /sbin/install-info --delete %{_infodir}/sbcl.info %{_infodir}/dir ||:
-  /sbin/install-info --delete %{_infodir}/asdf.info %{_infodir}/dir ||:
-%endif
 %if 0%{?common_lisp_controller}
 /usr/sbin/unregister-common-lisp-implementation sbcl > /dev/null 2>&1 ||:
 %endif
