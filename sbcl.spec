@@ -1,4 +1,4 @@
-
+%global _legacy_common_support 1
 %define common_lisp_controller 1
 
 # generate/package docs
@@ -11,7 +11,7 @@
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
 Version: 1.4.14
-Release: 4%{?dist}
+Release: 5%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -265,6 +265,9 @@ fi
 
 
 %changelog
+* Mon Feb 17 2020 Than Ngo <than@redhat.com> - 1.4.14-5
+- Fixed FTBFS
+
 * Thu Jan 30 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1.4.14-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
