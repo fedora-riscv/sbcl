@@ -1,0 +1,12 @@
+diff -up sbcl-1.4.14/src/runtime/linux-os.c.me sbcl-1.4.14/src/runtime/linux-os.c
+--- sbcl-1.4.14/src/runtime/linux-os.c.me	2020-02-19 13:40:23.861045110 +0100
++++ sbcl-1.4.14/src/runtime/linux-os.c	2020-02-19 13:46:55.135435217 +0100
+@@ -64,7 +64,7 @@ int personality (unsigned long);
+ #include <sys/personality.h>
+ #endif
+ 
+-size_t os_vm_page_size;
++//size_t os_vm_page_size;
+ 
+ #if defined(LISP_FEATURE_SB_THREAD) && defined(LISP_FEATURE_SB_FUTEX) && !defined(LISP_FEATURE_SB_PTHREAD_FUTEX)
+ #include <sys/syscall.h>
