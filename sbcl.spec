@@ -1,4 +1,3 @@
-%global _legacy_common_support 1
 %define common_lisp_controller 1
 
 # generate/package docs
@@ -108,9 +107,11 @@ Patch6: sbcl-0.9.5-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.3.0-generate_version.patch
+Patch51: sbcl-1.4.14-gcc10.patch
 
 ## upstream patches
 
+BuildRequires: ctags-etags
 BuildRequires: gcc
 BuildRequires: zlib-devel
 # %%check/tests
@@ -140,6 +141,7 @@ pushd sbcl-%{version}
 %patch3 -p1 -b .optflags
 %{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
 %patch50 -p1 -b .generate_version
+%patch51 -p1 -b .gcc10
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -158,6 +160,7 @@ pushd sbcl-%{version}
 
 export CFLAGS="%{?optflags}"
 export LDFLAGS="%{?__global_ldflags}"
+export CC=gcc
 
 export SBCL_HOME=%{_prefix}/lib/sbcl
 %{?sbcl_arch:export SBCL_ARCH=%{sbcl_arch}}
