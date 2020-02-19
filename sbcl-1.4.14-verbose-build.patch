@@ -1,0 +1,29 @@
+diff -up sbcl-1.4.14/make.sh.me sbcl-1.4.14/make.sh
+--- sbcl-1.4.14/make.sh.me	2020-02-19 16:13:35.440997688 +0100
++++ sbcl-1.4.14/make.sh	2020-02-19 16:14:01.407430178 +0100
+@@ -24,7 +24,7 @@ export LANG LC_ALL
+ # thing" when run on the target machine, with the minor caveat that
+ # any --xc-host parameter should be suitable for the host machine
+ # instead of the target.
+-sh make-config.sh "$@" || exit $?
++sh -x make-config.sh "$@" || exit $?
+ 
+ . output/prefix.def
+ . output/build-config
+@@ -76,11 +76,11 @@ maybetime() {
+         $@
+     fi
+ }
+-maybetime sh make-host-1.sh
+-maybetime sh make-target-1.sh
+-maybetime sh make-host-2.sh
+-maybetime sh make-target-2.sh
+-maybetime sh make-target-contrib.sh
++maybetime sh -x make-host-1.sh
++maybetime sh -x make-target-1.sh
++maybetime sh -x make-host-2.sh
++maybetime sh -x make-target-2.sh
++maybetime sh -x make-target-contrib.sh
+ 
+ NCONTRIBS=`find contrib -name Makefile -print | wc -l`
+ NPASSED=`find obj/asdf-cache -name test-passed.test-report -print | wc -l`
