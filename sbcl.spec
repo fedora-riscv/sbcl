@@ -4,7 +4,7 @@
 %define docs 1
 
 # define to enable verbose build for debugging
-#define sbcl_verbose 1 
+%define sbcl_verbose 1 
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
@@ -103,7 +103,7 @@ Source202: sbcl-install-clc.lisp
 
 Patch2: sbcl-1.4.14-personality.patch
 Patch3: sbcl-1.4.2-optflags.patch
-Patch6: sbcl-0.9.5-verbose-build.patch
+Patch6: sbcl-1.4.14-verbose-build.patch
 
 ## upstreamable patches
 Patch50: sbcl-1.3.0-generate_version.patch
