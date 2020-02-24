@@ -1,6 +1,6 @@
-diff -up sbcl-2.0.1/sbcl-2.0.1/make.sh.me sbcl-2.0.1/sbcl-2.0.1/make.sh
---- sbcl-2.0.1/sbcl-2.0.1/make.sh.me	2020-02-24 10:57:12.072885605 +0100
-+++ sbcl-2.0.1/sbcl-2.0.1/make.sh	2020-02-24 11:03:04.997282509 +0100
+diff -up sbcl-2.0.1/make.sh.me sbcl-2.0.1/make.sh
+--- sbcl-2.0.1/make.sh.me	2020-02-24 10:57:12.072885605 +0100
++++ sbcl-2.0.1/make.sh	2020-02-24 11:03:04.997282509 +0100
 @@ -24,7 +24,7 @@ export LANG LC_ALL
  # thing" when run on the target machine, with the minor caveat that
  # any --xc-host parameter should be suitable for the host machine
