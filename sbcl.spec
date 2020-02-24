@@ -4,13 +4,13 @@
 %define docs 1
 
 # define to enable verbose build for debugging
-%define sbcl_verbose 1 
+%define sbcl_verbose 0
 %define sbcl_shell /bin/bash
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 1.4.14
-Release: 5%{?dist}
+Version: 2.0.1
+Release: 1%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
@@ -101,13 +101,12 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch2: sbcl-1.4.14-personality.patch
-Patch3: sbcl-1.4.2-optflags.patch
-Patch6: sbcl-1.4.14-verbose-build.patch
+Patch1: sbcl-1.4.14-personality.patch
+Patch2: sbcl-1.4.2-optflags.patch
+Patch3: sbcl-2.0.1-verbose-build.patch
 
 ## upstreamable patches
-Patch50: sbcl-1.3.0-generate_version.patch
-Patch51: sbcl-1.4.14-gcc10.patch
+Patch100: sbcl-1.4.14-gcc10.patch
 
 ## upstream patches
 
@@ -134,14 +133,12 @@ interpreter, and debugger.
 %setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
+%patch1 -p1 -b .personality
+%patch2 -p1 -b .optflags
+%{?sbcl_verbose:%patch3 -p1 -b .verbose-build}
 
 # upstream patches
-
-%patch2 -p1 -b .personality
-%patch3 -p1 -b .optflags
-%{?sbcl_verbose:%patch6 -p1 -b .verbose-build}
-%patch50 -p1 -b .generate_version
-%patch51 -p1 -b .gcc10
+%patch100 -p1 -b .gcc10
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -268,6 +265,9 @@ fi
 
 
 %changelog
+* Mon Feb 24 2020 Than Ngo <than@redhat.com> - 2.0.1-1
+- update to 2.0.1
+
 * Mon Feb 17 2020 Than Ngo <than@redhat.com> - 1.4.14-5
 - Fixed FTBFS
 
