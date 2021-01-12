@@ -110,6 +110,7 @@ Patch100: sbcl-1.4.14-gcc10.patch
 
 ## upstream patches
 
+BuildRequires: make
 BuildRequires: ctags-etags
 BuildRequires: gcc
 BuildRequires: zlib-devel
