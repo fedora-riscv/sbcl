@@ -1,5 +1,7 @@
 %define common_lisp_controller 1
 
+%bcond_without bootstrap
+
 # generate/package docs
 %define docs 1
 
@@ -9,14 +11,19 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
+%ifarch riscv64
+Version: 2.2.2
+Release: 1.rv64%{?dist}
+%else
 Version: 2.0.1
 Release: 9%{?dist}
+%endif
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 
-ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64
+ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64 riscv64
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -91,6 +98,18 @@ BuildRequires: sbcl
 #define sbcl_bootstrap_dir sbcl-1.3.16-arm64-linux
 %endif
 
+## riscv64 section
+Source80: sbcl-2.2.2-1-riscv64.pkg.tar.zst
+%ifarch riscv64
+%define sbcl_arch riscv64
+%if %{without bootstrap}
+BuildRequires: sbcl
+%endif
+# or
+%define sbcl_bootstrap_src -b 80
+%define sbcl_bootstrap_dir sbcl-1.3.16-riscv64-linux
+%endif
+
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -134,12 +153,14 @@ interpreter, and debugger.
 %setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
+%ifnarch riscv64
 %patch1 -p1 -b .personality
 %patch2 -p1 -b .optflags
 %{?sbcl_verbose:%patch3 -p1 -b .verbose-build}
 
 # upstream patches
 %patch100 -p1 -b .gcc10
+%endif
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -170,7 +191,11 @@ export SBCL_HOME=%{_prefix}/lib/sbcl
 ./make.sh \
   --prefix=%{_prefix} \
   --with-sb-core-compression \
+%ifarch riscv64
+  %{?sbcl_bootstrap_dir:--xc-host="`pwd`/../../usr/bin/sbcl --disable-debugger"}
+%else
   %{?sbcl_bootstrap_dir:--xc-host="`pwd`/../%{sbcl_bootstrap_dir}/run-sbcl.sh"}
+%endif
 
 # docs
 %if 0%{?docs}
@@ -270,6 +295,9 @@ fi
 
 
 %changelog
+* Fri Mar 31 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.2-1.rv64~bootstrap
+- Using binaries from Arch Linux to bootstrap sbcl-2.2.2 on riscv64 for Fedora.
+
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
