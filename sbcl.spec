@@ -9,14 +9,14 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 2.0.1
-Release: 9%{?dist}
+Version: 2.2.2
+Release: 1.rv64%{?dist}
 
 License: BSD
 URL:	 http://sbcl.sourceforge.net/
 Source0: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-source.tar.bz2
 
-ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64
+ExclusiveArch: %{arm} %{ix86} x86_64 ppc sparcv9 aarch64 riscv64
 
 # Pre-generated html docs
 Source1: http://downloads.sourceforge.net/sourceforge/sbcl/sbcl-%{version}-documentation-html.tar.bz2
@@ -91,6 +91,16 @@ BuildRequires: sbcl
 #define sbcl_bootstrap_dir sbcl-1.3.16-arm64-linux
 %endif
 
+## riscv64 section
+# Source80: sbcl-2.2.2-1-riscv64.pkg.tar.zst
+%ifarch riscv64
+%define sbcl_arch riscv64
+BuildRequires: sbcl
+# or
+#define sbcl_bootstrap_src -b 80
+#define sbcl_bootstrap_dir sbcl-1.3.16-riscv64-linux
+%endif
+
 %if 0%{?common_lisp_controller}
 BuildRequires: common-lisp-controller
 Requires:      common-lisp-controller
@@ -101,12 +111,7 @@ Source201: sbcl.rc
 Source202: sbcl-install-clc.lisp
 %endif
 
-Patch1: sbcl-1.4.14-personality.patch
-Patch2: sbcl-1.4.2-optflags.patch
-Patch3: sbcl-2.0.1-verbose-build.patch
-
 ## upstreamable patches
-Patch100: sbcl-1.4.14-gcc10.patch
 
 ## upstream patches
 
@@ -134,12 +139,6 @@ interpreter, and debugger.
 %setup -q -c -n sbcl-%{version} -a 1 %{?sbcl_bootstrap_src}
 
 pushd sbcl-%{version}
-%patch1 -p1 -b .personality
-%patch2 -p1 -b .optflags
-%{?sbcl_verbose:%patch3 -p1 -b .verbose-build}
-
-# upstream patches
-%patch100 -p1 -b .gcc10
 
 # fix permissions (some have eXecute bit set)
 find . -name '*.c' | xargs chmod 644
@@ -270,6 +269,9 @@ fi
 
 
 %changelog
+* Fri Mar 31 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.2-1.rv64
+- Built sbcl-2.2.2 for Fedora riscv64.
+
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.0.1-9
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
