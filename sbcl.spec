@@ -119,6 +119,7 @@ BuildRequires: make
 BuildRequires: ctags
 BuildRequires: gcc
 BuildRequires: zlib-devel
+BuildRequires: libzstd-devel
 # %%check/tests
 BuildRequires: ed
 BuildRequires: hostname
