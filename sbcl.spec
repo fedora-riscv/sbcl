@@ -9,7 +9,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 2.2.10
+Version: 2.2.11
 Release: 1.rv64%{?dist}
 
 License: BSD
@@ -270,6 +270,9 @@ fi
 
 
 %changelog
+* Fri Mar 31 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.11-1.rv64
+- Update to upstream 2.2.11
+
 * Sun Apr 02 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.10-1.rv64
 - Update to upstream 2.2.10
 
