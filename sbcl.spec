@@ -9,7 +9,7 @@
 
 Name: 	 sbcl
 Summary: Steel Bank Common Lisp
-Version: 2.2.2
+Version: 2.2.3
 Release: 1.rv64%{?dist}
 
 License: BSD
@@ -269,6 +269,9 @@ fi
 
 
 %changelog
+* Fri Mar 31 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.3-1.rv64
+- Update to upstream 2.2.3
+
 * Fri Mar 31 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 2.2.2-1.rv64
 - Built sbcl-2.2.2 for Fedora riscv64.
 
